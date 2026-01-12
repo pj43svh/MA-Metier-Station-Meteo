@@ -1,3 +1,10 @@
+<!--
+Auteur : Théo
+Date : 12.01.26
+Version : ALPHA 1.1
+Ajout : En-tête & commentaire
+-->
+
 # MA-MÉTIER STATION MÉTÉO
 
 Nous avons 3 semaines pour créer ce projets en partant de zéro
@@ -32,7 +39,7 @@ si jamais, j'ai utilisé 0% d'ia  -->
 git clone https://github.com/pj43svh/MA-Metier-Station-Meteo.git
 ```
 2. ### Flasher les cartes
-    <!--on fera la suite en temps voulut.--!>
+    <!--on fera la suite en temps voulut.-->
 
 ## 💡 Crédit
 
