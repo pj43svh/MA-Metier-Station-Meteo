@@ -22,7 +22,7 @@ Nous avons 3 semaines pour créer ce projets en partant de zéro
 <!-- ⚠️ section à supprimer plus tard
 si jamais, j'ai utilisé 0% d'ia  -->
 
-
+- [KanBan](https://trello.com/invite/b/6965f7158ea7d04041b38cae/ATTI88c024b14cb4c763a97249e76ec05ee959BB9D3A/station-meteo-esp32-rpi)
 - [Cahier des charges](/Cahier%20des%20charges%20station%20météo.md)
 - [feuille des disponibilités](/disponibilite.md)
 
