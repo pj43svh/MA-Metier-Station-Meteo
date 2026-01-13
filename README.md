@@ -46,7 +46,7 @@ git clone https://github.com/pj43svh/MA-Metier-Station-Meteo.git
 ### Membre du projet
 
 * [@Abeeby](https://github.com/Abeeby)
-* [@TonUserName](https://github.com/TonUserName)
+* [@AurelienRo](https://github.com/AurelienRo)
 * [@TonUserName](https://github.com/TonUserName)
 * [@pj43svh](https://github.com/pj43svh)
 
