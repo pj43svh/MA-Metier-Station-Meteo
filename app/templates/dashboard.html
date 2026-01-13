@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Station Météo{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- En-tête avec date et heure -->
+    <header class="dashboard-header">
+        <div class="datetime">
+            <span class="time" id="current-time">--:--</span>
+            <span class="date" id="current-date">--</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="openAddCapteurModal()">
+                + Ajouter capteur
+            </button>
+            <button class="btn btn-secondary" onclick="refreshData()">
+                🔄 Rafraîchir
+            </button>
+        </div>
+    </header>
+
+    <!-- Statut de connexion -->
+    <div class="status-bar">
+        <span class="status-indicator" id="status-indicator">●</span>
+        <span id="status-text">Connexion...</span>
+        <span class="last-update">Dernière mise à jour: <span id="last-update">--</span></span>
+    </div>
+
+    <!-- Grille des capteurs -->
+    <section class="sensors-grid" id="sensors-grid">
+        <!-- Les cartes capteurs seront ajoutées ici par JavaScript -->
+        <div class="loading-placeholder">
+            <div class="spinner"></div>
+            <p>Chargement des capteurs...</p>
+        </div>
+    </section>
+
+    <!-- Message si aucun capteur -->
+    <div class="empty-state" id="empty-state" style="display: none;">
+        <div class="empty-icon">📡</div>
+        <h3>Aucun capteur enregistré</h3>
+        <p>Ajoutez votre premier capteur pour commencer à surveiller la météo.</p>
+        <button class="btn btn-primary" onclick="openAddCapteurModal()">
+            + Ajouter un capteur
+        </button>
+    </div>
+</div>
+
+<!-- Modal Ajout Capteur -->
+<div class="modal" id="add-capteur-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Ajouter un capteur</h2>
+            <button class="modal-close" onclick="closeAddCapteurModal()">&times;</button>
+        </div>
+        <form id="add-capteur-form" onsubmit="addCapteur(event)">
+            <div class="form-group">
+                <label for="esp_id">ID ESP32 *</label>
+                <input type="text" id="esp_id" name="esp_id" required
+                       placeholder="Ex: ESP32_001">
+                <small>Identifiant unique programmé dans l'ESP32</small>
+            </div>
+            <div class="form-group">
+                <label for="nom">Nom du capteur *</label>
+                <input type="text" id="nom" name="nom" required
+                       placeholder="Ex: Capteur Jardin">
+            </div>
+            <div class="form-group">
+                <label for="localisation">Localisation</label>
+                <input type="text" id="localisation" name="localisation"
+                       placeholder="Ex: Jardin arrière">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeAddCapteurModal()">
+                    Annuler
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    Ajouter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Détails Capteur -->
+<div class="modal" id="capteur-details-modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2 id="detail-capteur-nom">Détails du capteur</h2>
+            <button class="modal-close" onclick="closeCapteurDetailsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-info">
+                <p><strong>ID:</strong> <span id="detail-esp-id">--</span></p>
+                <p><strong>Localisation:</strong> <span id="detail-localisation">--</span></p>
+                <p><strong>Dernière connexion:</strong> <span id="detail-derniere-connexion">--</span></p>
+            </div>
+            <div class="detail-actions">
+                <button class="btn btn-danger" id="delete-capteur-btn">
+                    🗑️ Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
