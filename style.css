@@ -1,0 +1,263 @@
+/* ----------------------------
+   Base
+---------------------------- */
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f4f6f8;
+  color: #111827;
+}
+
+/* ----------------------------
+   Layout principal (responsive sans @media)
+   - Le menu passe au-dessus si l'écran est trop petit (flex-wrap)
+---------------------------- */
+.app {
+  display: flex;
+  flex-wrap: wrap;        /*  clé du responsive sans @media */
+  min-height: 100vh;
+}
+
+/* ----------------------------
+   Sidebar (menu)
+---------------------------- */
+@media screen and (max-width:500px) {
+    .sidebar {
+    width: 100%;
+    min-width: 200px;       /*  évite d'écraser le menu */
+    background: #1f2933;
+    color: #ffffff;
+    padding: 20px;
+}
+}
+.sidebar {
+  width: 220px;
+  min-width: 200px;       /*  évite d'écraser le menu */
+  background: #1f2933;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin: 0 0 14px 0;
+}
+
+/* Menu en ligne si pas assez de place (sans @media) */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  display: flex;          /*  permet menu horizontal si besoin */
+  flex-wrap: wrap;        /*  passe à la ligne automatiquement */
+  gap: 10px;
+  justify-content: center;
+}
+
+.sidebar li {
+  padding: 12px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.sidebar li:hover,
+.sidebar li.active {
+  background: #3b82f6;
+}
+
+/* ----------------------------
+   Contenu
+---------------------------- */
+.content {
+  flex: 1;
+  min-width: 280px;       /*  évite que le contenu devienne illisible */
+  padding: 30px;
+}
+
+.content h1 {
+  margin: 0;
+  font-size: clamp(22px, 3.6vw, 34px); /*  texte responsive sans @media */
+}
+
+/* ----------------------------
+   Cards (déjà responsive grâce à auto-fit/minmax)
+---------------------------- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /*  auto responsive */
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.10);
+}
+
+.card span {
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.card h2 {
+  margin: 14px 0 0 0;
+  font-weight: 700;
+  font-size: clamp(20px, 4vw, 28px); /*  valeur responsive */
+}
+
+/* ----------------------------
+   Pages (navigation Dashboard / Historique / À propos)
+---------------------------- */
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+/* ----------------------------
+   À propos (joli bloc lisible)
+---------------------------- */
+.about-card {
+  max-width: 900px;
+  margin-top: 20px;
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.10);
+  line-height: 1.6;
+}
+
+.about-card h3 {
+  margin: 18px 0 8px 0;
+  font-size: 18px;
+}
+
+.about-card p {
+  margin: 0 0 8px 0;
+  color: #374151;
+}
+
+.about-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #374151;
+}
+
+/* ----------------------------
+   Accordéon (À propos)
+---------------------------- */
+.accordion {
+  margin-bottom: 12px;
+}
+
+.accordion-header {
+  width: 100%;
+  background: #e5e7eb;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.accordion-header:hover {
+  background: #dbeafe;
+}
+
+.accordion-content {
+  display: none;
+  padding: 12px 14px;
+  margin-top: 6px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.accordion-content.open {
+  display: block;
+}
+
+/* ----------------------------
+   Historique
+---------------------------- */
+.history-card {
+  margin-top: 20px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.10);
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.history-table th,
+.history-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.history-table th {
+  background: #f3f4f6;
+  font-weight: bold;
+}
+
+.history-table tr:hover {
+  background: #f9fafb;
+}
+
+/* =========================
+   RESPONSIVE MENU (MOBILE)
+========================= */
+@media (max-width: 768px) {
+
+  /* Layout général */
+  .app {
+    flex-direction: column;
+  }
+
+  /* Menu en haut */
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    padding: 16px 10px;
+  }
+
+  .sidebar h2 {
+    margin-bottom: 10px;
+  }
+
+  /* Menu horizontal */
+  .sidebar ul {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  .sidebar li {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  /* Contenu en dessous */
+  .content {
+    padding: 16px;
+  }
+}

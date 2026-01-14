@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station Météo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+    <!-- MENU -->
+    <nav class="sidebar">
+        <h2>🌦️ Météo</h2>
+        <ul>
+            <li class="active" data-page="dashboard">Dashboard</li>
+            <li data-page="historique">Historique</li>
+            <li data-page="apropos">À propos</li>
+        </ul>
+    </nav>
+
+    <!-- CONTENU -->
+    <main class="content">
+        <section id="dashboard" class="page active">
+            <h1>Dashboard météo</h1>
+
+            <div class="cards">
+                <div class="card">
+                    <span>🌡️ Température</span>
+                    <h2 id="temp">-- °C</h2>
+                </div>
+
+                <div class="card">
+                    <span>💧 Humidité</span>
+                    <h2 id="hum">-- %</h2>
+                </div>
+
+                <div class="card">
+                    <span>🌬️ Pression</span>
+                    <h2 id="press">-- hPa</h2>
+                </div>
+
+                <div class="card">
+                    <span>🕒 Mise à jour</span>
+                    <h2 id="time">--</h2>
+                </div>
+            </div>
+        </section>
+
+        <section id="apropos" class="page">
+            <h1>À propos</h1>
+
+            <div class="about-card">
+                <div class="about-card">
+                    <div class="accordion">
+                        <button class="accordion-header">📌 Présentation</button>
+                        <div class="accordion-content">
+                            <p>
+                                Ce projet consiste à realiser une station météorologique connectée.
+                                Les données sont mesurées par des capteurs, envoyées à une Raspberry Pi,
+                                puis affichées sur cette interface web.
+                            </p>
+                        </div>
+                    </div>
+            
+                <div class="accordion">
+                    <button class="accordion-header">⚙️ Fonctionnement</button>
+                    <div class="accordion-content">
+                        <p>
+                            L'ESP32 lit les capteurs et transmet les mesures via Wifi.
+                            La Raspberry Pi reçoit les données et les met à disposition via une API,
+                            afin que le site web puisse les afficher en temps réel.
+                        </p>   
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <button class="accordion-header">🧪 Technologies</button>
+                    <div class="accordion-content">
+                        <ul>
+                    <li>ESP32 + capteurs météo</li>
+                    <li>Wifi (réseau local)</li>
+                    <li>Raspberry Pi (seveur / API)</li>
+                    <li>HTML / CSS / JavaScript</li>
+                        </ul>
+
+                    </div>
+                </div>
+
+                <div class="accordion">
+                    <button class="accordion-header">👥 Travail en groupe</button>
+                    <div class="accordion-content">
+                        <p>
+                            Le projet est réalisé en groupe avec une répartition des tâches.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="historique" class="page">
+            <h1>Historique</h1>
+            <div class="history-card">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Heure</th>
+                            <th>Température</th>
+                            <th>Humidité (%)</th>
+                            <th>Pression (hPa)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
