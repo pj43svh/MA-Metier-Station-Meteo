@@ -1,5 +1,6 @@
 html {
     height: 100%;
+    min-height: 100%;
 }
 
 body {
@@ -188,4 +189,8 @@ thead{
 .card h2 {
     margin: 5px;
     font-size: 1.5em;
+}
+
+.graphique{
+    border-radius: 10px;
 }
