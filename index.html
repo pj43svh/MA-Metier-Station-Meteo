@@ -2,11 +2,33 @@
 <html lang="fr">
 <head>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <title>Dashboard</title>
 </head>
 <body>
+    <!--side bar-->
+    <nav>
+        <img src="meteoswiss-svgrepo-com.png" alt="icone" id="logo" class="logo">
+        <div class="link">
+            <hr>
+            <h2>Accueil</h2>
+            <hr>
+            <ul>
+                <li><a href="/statistic.html">Statistique</a></li>
+                <li><a href="/a_propos.html">à propos</a></li>
+                <li><a href="/historique.html">Historique</a></li>  
+            </ul>
+            <hr>
+            <ul>
+                <li><a href="https://github.com/pj43svh/MA-Metier-Station-Meteo">Github</a></li>
+                <li><a href="https://cpnv.ch">Cpnv</a></li>
+                <li><a href="https://trello.com/b/mbKZJSjJ/station-m%C3%A9t%C3%A9o-esp32-rpi">Trello</a></li>  
+            </ul>
+            <hr>
+        </div>
     <!--side bar-->
     <nav>
         <img src="meteoswiss-svgrepo-com.png" alt="icone" id="logo" class="logo">
@@ -31,7 +53,22 @@
                 <h2>Température :</h2>
                 <p id="temperature">-2 °C</p>
             </div>
+    <div>
+        <h1>DASHBOARD</h1>
+
+        <div class="content">
+
+            <div class="donnee" id="temperature">
+                <h2>Température :</h2>
+                <p id="temperature">-2 °C</p>
+            </div>
             
+            <div class="donnee"id="vent">
+                <h1></h1>
+                <h2>vitesse du vent :</h2>
+                <p id="vitesse_vent">5 km/h</p>
+                <h2>direction :</h2>
+                <p id="direction_vent">NE 30°</p>
             <div class="donnee"id="vent">
                 <h1></h1>
                 <h2>vitesse du vent :</h2>
@@ -43,9 +80,17 @@
             <div class="donnee" id="graphique_pluie">
                 <h2>Taux de pluie :</h2>
                 <div id="graf_pluie"></div>
+
+            <div class="donnee" id="graphique_pluie">
+                <h2>Taux de pluie :</h2>
+                <div id="graf_pluie"></div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
+
+
 
 
 
