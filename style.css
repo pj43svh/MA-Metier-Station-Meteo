@@ -1,7 +1,8 @@
-html{
+html {
     height: 100%;
 }
-body{
+
+body {
     background-color: #313131;
     color: #ffffff;
     font-family: Arial, Helvetica, sans-serif;
@@ -10,69 +11,78 @@ body{
     height: 100%;
 }
 
-nav .logo{
-    background-color:white;
+nav .logo {
+    background-color: white;
     display: flex;
     width: 30%;
     height: auto;
     border-radius: 50%;
     padding: 10px;
 }
-nav{
+
+nav {
     margin-right: 10px;
     padding: 10px;
     width: 15%;
     background-color: #272727;
     flex-direction: row;
     height: 100%;
-    
-}
-nav link{
-    display: flex;
-    flex-direction: column;
-    
+
 }
 
-nav a{
+nav link {
+    display: flex;
+    flex-direction: column;
+
+}
+
+nav a {
     color: inherit;
     margin: 10px;
     font-size: 1em;
 }
-nav h2{
+
+nav h2 {
     font-size: 2em;
     margin-left: 10px;
 }
-nav ul{
+
+nav ul {
     padding-left: 0%;
 }
-nav li{
+
+nav li {
     list-style-type: none;
     margin-bottom: 10px;
     margin-right: 30px;
-    
+
 }
+
 nav a:hover {
     color: #50ff50;
 }
 
-.content{
+.content {
     padding: 10px;
     flex-wrap: wrap;
     align-content: space-between;
+    justify-content: center;
     display: flex;
 }
 
-.donnee{
+.donnee {
     background-color: #424242;
     padding: 10px;
     border-radius: 10px;
     margin: 10px;
 }
-.donnee h2{
+
+.donnee h2 {
     margin: 5px;
     font-size: 1.5em;
 }
-.donnee p{
+
+.donnee p {
     font-size: 3em;
     margin: 10px;
     padding: 8px;
@@ -80,7 +90,8 @@ nav a:hover {
     border-radius: 10px;
     text-align: center;
 }
-#graf_pluie{
+
+.graf {
     width: 500px;
     height: 200px;
     font-size: 50px;
@@ -90,22 +101,79 @@ nav a:hover {
     border-radius: 10px;
 }
 
-@media screen and (max-width:1000px){
-    body{
+@media screen and (max-width:1000px) {
+    body {
         flex-direction: column;
     }
-    nav{
-        width:100%;
+
+    nav {
+        width: 100%;
         text-align: center;
         align-content: center;
     }
-    nav .logo{
-    background-color:white;
-    display: flex;
-    width: 10%;
-    height: auto;
-    border-radius: 50%;
-    padding: 10px;
+
+    nav .logo {
+        background-color: white;
+        display: flex;
+        width: 10%;
+        height: auto;
+        border-radius: 50%;
+        padding: 10px;
     }
-    
+    .graf{
+        width: auto;
+    }
+    .card{
+        width: 100%;
+    }
+
+}
+
+.history-card {
+    margin-top: 20px;
+    background: #7a7a7a;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.10);
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.history-table th,
+.history-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #424242;
+    text-align: center;
+}
+
+.history-table th {
+    background: #696969;
+    font-weight: bold;
+}
+
+.history-table tr:hover {
+    background: #f9fafb;
+}
+
+.card {
+    background-color: #424242;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px;
+}
+.card-content{
+    max-width: 500px;
+    padding: 10px;
+    background-color: #505050;
+    border-radius: 10px;
+}
+
+.card h2 {
+    margin: 5px;
+    font-size: 1.5em;
 }

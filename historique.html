@@ -3,10 +3,8 @@
 
 <head>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
     <title>Dashboard</title>
 </head>
 
@@ -21,7 +19,7 @@
             <ul>
                 <li><a href="/index.html">Données</a></li>
                 <li><a href="/a_propos.html">À propos</a></li>
-                <li><a href="/statistique.html">Statistique</a></li>
+                <li><a href="/a_propos.html">Statistique</a></li>
                 <li><a href="/historique.html">Historique</a></li>
             </ul>
             <hr>
@@ -33,32 +31,34 @@
             <hr>
         </div>
     </nav>
-                <div>
-                    <h1>DASHBOARD</h1>
+    <div>
+        <section id="historique" class="card">
+            <h1>Historique</h1>
+            <div class="history-card">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Heure</th>
+                            <th>Température</th>
+                            <th>Humidité (%)</th>
+                            <th>Pression (hPa)</th>
+                        </tr>
+                        <tr>
+                            <th>12.01.2026</th>
+                            <th>08:00</th>
+                            <th>-4 °C</th>
+                            <th>12 (%)</th>
+                            <th>1015 (hPa)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
 
-                    <div class="content">
-
-                        <div class="donnee" id="temperature">
-                            <h2>Température :</h2>
-                            <p id="temperature">-2 °C</p>
-                        </div>
-
-                        <div class="donnee" id="vent">
-                            <h1></h1>
-                            <h2>vitesse du vent :</h2>
-                            <p id="vitesse_vent">5 km/h</p>
-                            <h2>direction :</h2>
-                            <p id="direction_vent">NE 30°</p>
-
-
-                        </div>
-                    </div>
-                </div>
-
-
-
-
-
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
 </body>
 
 </html>
