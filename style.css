@@ -97,13 +97,13 @@ nav li a:hover {
     text-align: center;
 }
 
-.graf {
+canvas {
     width: 500px;
     height: 200px;
     font-size: 50px;
     margin: 10px;
     padding: 8px;
-    background-color: #7a7a7a;
+    background-color: #505050;
     border-radius: 10px;
 }
 
@@ -128,7 +128,7 @@ nav li a:hover {
         padding: 10px;
         justify-self: center;
     }
-    .graf{
+    canvas{
         width: auto;
     }
     .card{

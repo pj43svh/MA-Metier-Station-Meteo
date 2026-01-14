@@ -3,10 +3,8 @@
 
 <head>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
     <title>Dashboard</title>
 </head>
 
@@ -19,10 +17,10 @@
             <a href="index.html"><h2>Accueil</h2></a>
             <hr>
             <ul>
-                <li><a href="/index.html">Données</a></li>
-                <li><a href="/a_propos.html">À propos</a></li>
-                <li><a href="/statistique.html">Statistique</a></li>
-                <li><a href="/historique.html">Historique</a></li>
+                <li><a href="index.html">Données</a></li>
+                <li><a href="a_propos.html">À propos</a></li>
+                <li><a href="statistique.html">Statistique</a></li>
+                <li><a href="historique.html">Historique</a></li>
             </ul>
             <hr>
             <ul>
@@ -40,15 +38,16 @@
         <div class="content">
 
             <div class="card" id="graphique_pluie">
-                <h2>Taux de pluie :</h2>
-                <div id="graf_pluie" class="graf"></div>
+                <canvas id="graf_pluie"></canvas>
             </div>
 
-                <div class="card" id="graphique_temp">
-                    <h2>Température :</h2>
-                    <div id="graphique_temp" class="graf"></div>
-                </div>
-
+            <div class="card" id="graphique_temperature">
+                <canvas id="graf_temperature"></canvas>
+            </div>
+            
+            <div class="card" id="graphique_temps">
+                <canvas id="graf_temps"></canvas>
+            </div>
 
         </div>
     </div>
@@ -58,4 +57,7 @@
 
 </body>
 
+
 </html>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="graphique.js"></script>
