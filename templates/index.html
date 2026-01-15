@@ -14,12 +14,10 @@
         <img src="static\icone.png" alt="icone" id="logo" class="logo">
         <div class="link">
             <hr>
-            <a href="">
-                <h2>Accueil</h2>
-            </a>
+            <a href="/"><h2>Accueil</h2></a>
             <hr>
             <ul>
-                <li><a href="">Données</a></li>
+                <li><a href="/">Données</a></li>
                 <li><a href="a_propos">À propos</a></li>
                 <li><a href="statistique">Statistique</a></li>
                 <li><a href="historique">Historique</a></li>
@@ -64,51 +62,7 @@
 
 
 
-    <script>
-        function updateTemperature() {
-            fetch('/api/temperature')
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('temperature').textContent = text + ' °C';
-            });
-        }
-
-        function updatePression() {
-            fetch('/api/pression')
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('pression').textContent = text + ' hPa';
-            });
-        }
-
-        function updateHumidite() {
-            fetch('/api/humidite')
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('humidite').textContent = text + ' %';
-            });
-        }
-
-        function updateTemps() {
-            fetch('/api/temps')
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('temps').textContent = text;
-            });
-        }
-
-        // Met à jour dès le chargement
-        updateTemperature();
-        updatePression();
-        updateHumidite();
-        updateTemps();
-
-        // Met à jour toutes les 10 secondes
-        setInterval((updateTemperature), 10000);
-        setInterval((updatePression), 10000);
-        setInterval((updateHumidite), 10000);
-        setInterval((updateTemps), 10000);
-    </script>
+    <script src="/static/donnee.js"></script>
 
 </body>
 

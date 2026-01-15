@@ -1,7 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import matplotlib.pyplot as plt
 import os
 import time
@@ -11,7 +11,6 @@ app = Flask(__name__)
 
 
 json_file_path = "data.json"
-timestamps = ["12:00", "12:05", "12:10", "12:15", "12:20", "12:25", "12:30", "12:35", "12:40", "12:45"]
 
 
 ###############################################################################
@@ -39,11 +38,10 @@ def historique():
 @app.route("/statistique")
 def statistique():
     
-    create_graph_line("temperatures",timestamps,label_x="heures",label_y="°C",titre="Températures")
-    create_graph_bar("pluie",timestamps,label_x="heures",label_y="Millimètre",titre="Taux de pluie")
+    create_graph_line("temperatures","hordodatage",label_x="heures",label_y="°C",titre="Températures")
     create_graph_pie("temps","type_temps", titre="Répartition du temps")
-    create_graph_line("pression",timestamps,label_x="heures",label_y="hPa",titre="Pressions")
-    create_graph_bar("humidite",timestamps,label_x="heures",label_y="%",titre="Taux d'humidité")
+    create_graph_line("pression","hordodatage",label_x="heures",label_y="hPa",titre="Pressions")
+    create_graph_bar("humidite","hordodatage",label_x="heures",label_y="%",titre="Taux d'humidité")
 
     return render_template('statistique.html')
 
@@ -62,7 +60,7 @@ def create_graph_line(var,echelle,label_x="abscisse",label_y="ordonnée",titre="
         data = json.load(json_file)
 
     plt.figure(figsize=(x, y))
-    plt.plot(echelle, data.get(var)[-len(timestamps):], marker='o', color=couleur, label=titre)
+    plt.plot(data.get(echelle), data.get(var)[-len(data.get(echelle)):], marker='o', color=couleur, label=titre)
     plt.title(titre)
     plt.xlabel(label_x)
     plt.ylabel(label_y)
@@ -91,7 +89,7 @@ def create_graph_bar(var,echelle,label_x="abscisse",label_y="hauteur",titre="Tit
         data = json.load(json_file)
 
     plt.figure(figsize=(x, y))
-    plt.bar(echelle, data.get(var)[-len(timestamps):], color=couleur, label=titre)
+    plt.bar(data.get(echelle), data.get(var)[-len(data.get(echelle)):], color=couleur, label=titre)
     plt.title(titre)
     plt.xlabel(label_x)
     plt.ylabel(label_y)
@@ -162,12 +160,29 @@ def create_graph_pie(var,type_var, titre="Diagramme circulaire", x=8, y=8):
 ##########################___PARTIE DEDIEE A L'API___##########################
 ###############################################################################
 
+
 def api_donnee(type):
     with open(json_file_path, 'r') as json_file:
         data = json.load(json_file)
     # Récupère la dernière température
     value = data.get(type, ["?"])[-1]  # ? si pas de données
     return value
+
+def transforme_temps(temps):
+        temps = api_donnee("temps")
+        if temps == "0": # ensoleilé
+            return "☀️"
+        if temps == "1": # nuageux
+            return "☁️"
+        if temps == "2": # pluie
+            return "🌧️"
+        if temps == "3": # orage
+            return "🌩️"
+        if temps == "4": # neige
+            return "🌨️"
+        return
+
+##########################___API POUR LES DONNEES___###########################
 
 @app.route("/api/temperature")
 def api_temperature():
@@ -190,18 +205,40 @@ def api_humidite():
 @app.route("/api/temps")
 def api_temps():
     temps = api_donnee("temps")
-    if temps == "0": # ensoleilé
-        return "☀️"
-    if temps == "1": # nuageux
-        return "☁️"
-    if temps == "2": # pluie
-        return "🌧️"
-    if temps == "3": # orage
-        return "🌩️"
-    if temps == "4": # neige
-        return "🌨️"
-    return "X"
+    return transforme_temps(temps)
 
+
+##########################___API POUR L'HISTORIQUE___###########################
+
+@app.route('/api/history')
+def get_history():
+    with open(json_file_path, 'r') as json_file:
+        data = json.load(json_file)
+    dates = data.get("hordodatage",[])
+    temperatures = data.get("temperatures", [])
+    humidites = data.get("humidite", [])
+    pressions = data.get("pression", [])
+    temps = data.get("temps", [])
+    mapping = {
+        "0": "☀️",  # ensoleillé
+        "1": "☁️",  # nuageux
+        "2": "🌧️",  # pluie
+        "3": "🌩️",  # orage
+        "4": "🌨️"   # neige
+    }
+    temps_emojis = [mapping[x] for x in temps]
+    
+    return jsonify({
+        "date": dates,
+        "temperature": temperatures,
+        "humidite": humidites,
+        "pression": pressions,
+        "temps": temps_emojis
+    })
+
+###############################################################################
+###########################___LANCE L'APPLICATION___###########################
+###############################################################################
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
