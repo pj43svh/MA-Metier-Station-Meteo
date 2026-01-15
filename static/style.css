@@ -117,6 +117,7 @@ canvas {
         text-align: center;
         align-content: center;
         height: auto;
+        min-height: auto;
     }
 
     nav .logo {
