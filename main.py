@@ -22,29 +22,28 @@ json_file_path = "data.json"
 def index():
     return render_template("index.html")
 
-@app.route("/a_propos")
-def a_propos():
-    return render_template("a_propos.html")
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
-@app.route("/historique")
-def historique():
-    return render_template("historique.html")
-
-
-
-# Ajoute une fonction pour générer un timestamp dans les templates
+@app.route("/history")
+def history():
+    return render_template("history.html")
 
 
-@app.route("/statistique")
-def statistique():
+
+@app.route("/statistical")
+def statistical():
     
-    create_graph_line("temperatures","hordodatage",label_x="heures",label_y="°C",titre="Températures")
-    create_graph_pie("temps","type_temps", titre="Répartition du temps")
-    create_graph_line("pression","hordodatage",label_x="heures",label_y="hPa",titre="Pressions")
-    create_graph_bar("humidite","hordodatage",label_x="heures",label_y="%",titre="Taux d'humidité")
+    create_graph_line("temperature1","timestamp",label_x="heures",label_y="°C",titre="Temperatures")
+    create_graph_line("pressure1","timestamp",label_x="heures",label_y="hPa",titre="Pressures")
+    create_graph_bar("humidity1","timestamp",label_x="heures",label_y="%",titre="Humidity levels")
 
-    return render_template('statistique.html')
+    create_graph_line("temperature2","timestamp",label_x="heures",label_y="°C",titre="Temperatures")
+    create_graph_line("pressure2","timestamp",label_x="heures",label_y="hPa",titre="Pressures")
+    create_graph_bar("humidity2","timestamp",label_x="heures",label_y="%",titre="Humidity levels")
 
+    return render_template('statistical.html')
 
 
 ###############################################################################
@@ -55,7 +54,7 @@ def statistique():
 def inject_timestamp():
     return {"timestamp": lambda: int(time.time())}
 
-def create_graph_line(var,echelle,label_x="abscisse",label_y="ordonnée",titre="Titre du graphique",x=10,y=5,couleur="tab:blue"):
+def create_graph_line(var,echelle,label_x="abscissa",label_y="ordored",titre="Title",x=10,y=5,couleur="tab:blue"):
     with open(json_file_path, 'r') as json_file:
         data = json.load(json_file)
 
@@ -84,7 +83,7 @@ def create_graph_line(var,echelle,label_x="abscisse",label_y="ordonnée",titre="
         plt.close()
         return "Erreur interne — impossible de générer le graphique", 500
     
-def create_graph_bar(var,echelle,label_x="abscisse",label_y="hauteur",titre="Titre du graphique",x=10,y=5,couleur="tab:blue"):
+def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",titre="Title",x=10,y=5,couleur="tab:blue"):
     with open(json_file_path, 'r') as json_file:
         data = json.load(json_file)
 
@@ -112,48 +111,6 @@ def create_graph_bar(var,echelle,label_x="abscisse",label_y="hauteur",titre="Tit
         print(f"❌ Erreur lors de la sauvegarde : {e}")
         plt.close()
         return "Erreur interne — impossible de générer le graphique", 500
-
-def create_graph_pie(var,type_var, titre="Diagramme circulaire", x=8, y=8):
-    with open(json_file_path, 'r') as json_file:
-        data = json.load(json_file)
-
-    # Récupère les données du JSON
-    value = data.get(var, {})
-    type = data.get(type_var,{})
-    categories_data = {}
-    for i in range(len(set(value))):
-        i=str(i)
-        var_type = type.get(i)
-        categories_data[var_type]= value.count(i)
-        print(categories_data)
-
-    labels = list(categories_data.keys())
-    sizes = list(categories_data.values())
-
-    # Vérifie qu’il y a des données
-    if not labels or not sizes:
-        print(f"❌ Aucune donnée pour {var}")
-        return
-
-    plt.figure(figsize=(x, y))
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=plt.cm.Set3.colors)
-    plt.title(titre)
-    plt.axis('equal')  # Pour que le cercle soit rond
-
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    static_dir = os.path.join(BASE_DIR, 'static')
-    os.makedirs(static_dir, exist_ok=True)
-
-    file_path = os.path.join(static_dir, f"graph_{var}.png")
-
-    try:
-        plt.savefig(file_path)
-        plt.close()
-        print(f"✅ Graphique pie sauvegardé à : {file_path}")
-    except Exception as e:
-        print(f"❌ Erreur lors de la sauvegarde : {e}")
-        plt.close()
-        return "Erreur interne — impossible de générer le graphique", 500
     
 
 ###############################################################################
@@ -168,72 +125,81 @@ def api_donnee(type):
     value = data.get(type, ["?"])[-1]  # ? si pas de données
     return value
 
-def transforme_temps(temps):
-        temps = api_donnee("temps")
-        if temps == "0": # ensoleilé
-            return "☀️"
-        if temps == "1": # nuageux
-            return "☁️"
-        if temps == "2": # pluie
-            return "🌧️"
-        if temps == "3": # orage
-            return "🌩️"
-        if temps == "4": # neige
-            return "🌨️"
-        return
-
 ##########################___API POUR LES DONNEES___###########################
 
-@app.route("/api/temperature")
-def api_temperature():
-    temp = api_donnee("temperatures")
+@app.route("/api/temperature1")
+def api_temperature1():
+    temp = api_donnee("temperature1")
     return str(temp)
 
-@app.route("/api/pression")
-def api_pression():
-    pression = api_donnee("pression")
-    return str(pression)
+@app.route("/api/pressure1")
+def api_pressure1():
+    pressure = api_donnee("pressure1")
+    return str(pressure)
 
-@app.route("/api/humidite")
-def api_humidite():
+@app.route("/api/humidity1")
+def api_humidity1():
     try:
-        humidite = api_donnee("humidite")
+        humidity = api_donnee("humidity1")
     except:
-        humidite = "X"
-    return str(humidite)
+        humidity = "X"
+    return str(humidity)
 
-@app.route("/api/temps")
-def api_temps():
-    temps = api_donnee("temps")
-    return transforme_temps(temps)
+@app.route("/api/temperature2")
+def api_temperature2():
+    temp = api_donnee("temperature2")
+    return str(temp)
+
+@app.route("/api/pressure2")
+def api_pressure2():
+    pressure = api_donnee("pressure2")
+    return str(pressure)
+
+@app.route("/api/humidity2")
+def api_humidity2():
+    try:
+        humidity = api_donnee("humidity2")
+    except:
+        humidity = "X"
+    return str(humidity)
 
 
 ##########################___API POUR L'HISTORIQUE___###########################
 
-@app.route('/api/history')
-def get_history():
+@app.route('/api/history1')
+def get_history1():
     with open(json_file_path, 'r') as json_file:
         data = json.load(json_file)
-    dates = data.get("hordodatage",[])
-    temperatures = data.get("temperatures", [])
-    humidites = data.get("humidite", [])
-    pressions = data.get("pression", [])
-    temps = data.get("temps", [])
-    mapping = {
-        "0": "☀️",  # ensoleillé
-        "1": "☁️",  # nuageux
-        "2": "🌧️",  # pluie
-        "3": "🌩️",  # orage
-        "4": "🌨️"   # neige
-    }
-    temps_emojis = [mapping[x] for x in temps]
+    dates = data.get("timestamp",[])
+    temperatures = data.get("temperature1", [])
+    humiditys = data.get("humidity1", [])
+    pressures = data.get("pressure1", [])
+    
     
     return jsonify({
         "date": dates,
         "temperature": temperatures,
-        "humidite": humidites,
-        "pression": pressions,
-        "temps": temps_emojis
+        "humidity": humiditys,
+        "pressure": pressures
+    })
+
+
+
+@app.route('/api/history2')
+def get_history2():
+    with open(json_file_path, 'r') as json_file:
+        data = json.load(json_file)
+    dates = data.get("timestamp",[])
+    temperatures = data.get("temperature2", [])
+    humiditys = data.get("humidity2", [])
+    pressures = data.get("pressure2", [])
+    
+    
+    return jsonify({
+        "date": dates,
+        "temperature": temperatures,
+        "humidity": humiditys,
+        "pressure": pressures
     })
 
 ###############################################################################

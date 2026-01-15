@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather station - History</title>
+    <link rel="icon" type="image/x-icon" href="/static/icone.png">
+</head>
+
+<body>
+    <!--side bar-->
+    <nav>
+        <img src="static\icone.png" alt="icone" id="logo" class="logo">
+        <div class="link">
+            <hr>
+            <a href="/"><h2>Home</h2></a>
+            <hr>
+            <ul>
+                <li><a href="/">datas</a></li>
+                <li><a href="about">about</a></li>
+                <li><a href="statistical">statistical</a></li>
+                <li><a href="history">History</a></li>
+            </ul>
+            <hr>
+            <ul>
+                <li><a href="https://github.com/pj43svh/MA-Metier-Station-Meteo">Github</a></li>
+                <li><a href="https://cpnv.ch">Cpnv</a></li>
+                <li><a href="https://trello.com/b/mbKZJSjJ/station-m%C3%A9t%C3%A9o-esp32-rpi">Trello</a></li>
+            </ul>
+            <hr>
+        </div>
+    </nav>
+    <div>
+        <h1>HISTORY</h1>
+        <div class="content">
+        <section id="history1" class="card">
+            <div class="history-card">
+                <h1>Sensor 1</h1>
+                <table id="history1-table" class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Temperature</th>
+                            <th>Humidity (%)</th>
+                            <th>Pressure (hPa)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history1-body" class="history-body">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section id="history2" class="card">
+            <div class="history-card">
+                <h1>Sensor 2</h1>
+                <table id="history2-table" class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Temperature</th>
+                            <th>Humidity (%)</th>
+                            <th>Pressure (hPa)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history2-body" class="history-body">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        </div>
+    </div>
+
+    <script src="/static/js/history.js"></script>
+
+</body>
+
+</html>
