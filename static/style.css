@@ -145,15 +145,14 @@ canvas {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.10);
     overflow-x: auto;
 }
-
-#history-table {
+.history-table {
     width: 100%;
     border-collapse: collapse;
     min-width: 600px;
 }
 
-#history-table th,
-#history-table td {
+.history-table th,
+.history-table td {
     padding: 10px 12px;
     border-bottom: 1px solid #424242;
     text-align: center;
@@ -169,7 +168,7 @@ thead{
 }
 
 .history-table tr:hover {
-    background: #f9fafb;
+    background: #505050;
 }
 
 .card {
@@ -193,4 +192,10 @@ thead{
 
 .graphique{
     border-radius: 10px;
+}
+.sensors{
+    background-color: #505050;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px;
 }
