@@ -38,9 +38,10 @@ def history():
 @app.route("/statistical")
 def statistical():
     
-    create_graph_line(["temperature1","temperature2"],"date_hours",label_x="",label_y="°C",line_title=["Sensor 1","Sensor 2"],title="Temperatures", color =["tab:blue","tab:red"])
-    create_graph_line(["pressure1","pressure2"],"date_hours",label_x="",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"])
-    create_graph_bar(["humidity1","humidity2"],"date_hours",label_x="",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"])
+    # génèration des graphiques quand la page est appelée
+    create_graph_line(["temperature1","temperature2"],"hour",label_x="Hours",label_y="°C",line_title=["Sensor 1","Sensor 2"],title="Temperatures", color =["tab:blue","tab:red"])
+    create_graph_line(["pressure1","pressure2"],"hour",label_x="Hours",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"])
+    create_graph_bar(["humidity1","humidity2"],"hour",label_x="Hours",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"])
 
 
     return render_template('statistical.html')
@@ -49,10 +50,7 @@ def statistical():
 ###############################################################################
 #######################___PARTIE DEDIEE AU GRAPHIQUE___########################
 ###############################################################################
-
-@app.context_processor
-def inject_date_hours():
-    return {"date_hours": lambda: int(time.time())}
+''
 
 def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=["Line 1"], title="Title", x=10, y=5, color=["tab:blue"]):
     dates = api_datas_list(echelle)
@@ -93,7 +91,7 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
         plt.close()
         return "Erreur interne — impossible de générer le graphique", 500
 # exemple d'utilisation
-# create_graph_line(["pressure1","pressure2"],"date_hours",label_x="",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"])
+# create_graph_line(["pressure1","pressure2"],"hour",label_x="",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"])
 
 
 
@@ -136,7 +134,7 @@ def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=[
         return "Erreur interne — impossible de générer le graphique", 500
 
 # exemple d'utilisation
-# create_graph_bar(["humidity1","humidity2"],"date_hours",label_x="",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"])
+# create_graph_bar(["humidity1","humidity2"],"hour",label_x="",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"])
 
 
 ###############################################################################
@@ -159,7 +157,7 @@ def api_data(type_str):
     results = db.read_data(
         "weather_data",
         column=col,
-        where=f"device_id = {device_id} ORDER BY date_hours DESC LIMIT 1"
+        where=f"device_id = {device_id} ORDER BY hour DESC LIMIT 1"
     )
 
     if results and len(results) > 0:
@@ -168,26 +166,36 @@ def api_data(type_str):
     else:
         return "Aucune donnée"
     
-def api_datas_list(type_str, limit=10):
+def api_datas_list(type_str, limit=24):
     """Retourne une liste des dernières valeurs pour une colonne et un device_id"""
-    if type_str != "date_hours":
+    if type_str == "hour":
+        col = "hour"
+        device_id = 1
+    elif type_str == "date":
+        col = "date"
+        device_id = 1
+    else:
         col = type_str[:-1]
         device_id = int(type_str[-1])
-    else:
-        col = "date_hours"  # ← Important : utiliser le nom exact de la colonne
-        device_id = 1  # Arbitraire, car date_hours est commune à tous les devices
 
-    ALLOWED_COLUMNS = {"temperature", "humidity", "pressure", "date_hours"}
+    ALLOWED_COLUMNS = {"temperature", "humidity", "pressure", "date", "hour"}
 
     if col not in ALLOWED_COLUMNS:
-        return []  # Retourne une liste vide si colonne invalide
+        return []
 
-    # Requête : récupérer les dernières valeurs triées par date DESC
+    # ✅ Tri par id DESC (du plus récent au plus ancien)
     results = db.read_data(
         "weather_data",
         column=col,
-        where=f"device_id = {device_id} ORDER BY date_hours DESC LIMIT {limit}"
+        where=f"device_id = {device_id} ORDER BY id DESC LIMIT {limit}"
     )
+
+    if not results:
+        return []
+
+    values = [row[0] for row in results]
+
+    return values  # Ne pas inverser — tu veux du plus récent au plus ancien
 
     # Convertir en liste de valeurs (sans tuples)
     if not results:
@@ -253,16 +261,16 @@ def api_humidity2():
 
 @app.route('/api/history1')
 def get_history1():
-    with open(json_file_path, 'r') as json_file:
-        data = json.load(json_file)
-    dates = api_datas_list("date_hours")
+    date = api_datas_list("date")
+    hour = api_datas_list("hour")
     temperatures = api_datas_list("temperature1")
     humiditys = api_datas_list("humidity1")
     pressures = api_datas_list("pressure1")
     
     
     return jsonify({
-        "date": dates,
+        "date": date,
+        "hour":hour,
         "temperature": temperatures,
         "humidity": humiditys,
         "pressure": pressures
@@ -272,16 +280,16 @@ def get_history1():
 
 @app.route('/api/history2')
 def get_history2():
-    with open(json_file_path, 'r') as json_file:
-        data = json.load(json_file)
-    dates = api_datas_list("date_hours")
+    date = api_datas_list("date")
+    hour = api_datas_list("hour")
     temperatures = api_datas_list("temperature2")
     humiditys = api_datas_list("humidity2")
     pressures = api_datas_list("pressure2")
     
     
     return jsonify({
-        "date": dates,
+        "date": date,
+        "hour": hour,
         "temperature": temperatures,
         "humidity": humiditys,
         "pressure": pressures
@@ -290,7 +298,6 @@ def get_history2():
 ###############################################################################
 ###########################___LANCE L'APPLICATION___###########################
 ###############################################################################
-# 🔍 TEST : Vérifie si la base retourne bien des données
 
 
 if __name__ == '__main__':

@@ -26,7 +26,8 @@ def create_tables():
         temperature REAL,
         humidity REAL,
         pressure REAL,
-        date_hours TEXT NOT NULL,
+        date TEXT NOT NULL,
+        hour TEXT NOT NULL,
         device_id INTEGER NOT NULL,
         FOREIGN KEY (device_id) REFERENCES device (id) ON DELETE NO ACTION ON UPDATE NO ACTION
     );
@@ -68,7 +69,7 @@ create_tables()
 # Exemple d'ajout (décommenter si besoin)
 # add_data("device", value={"type": "ESP32", "address_ip": "192.168.1.32"})
 # add_data("device", value={"type": "ESP32", "address_ip": "192.168.1.33"})
-# add_data("weather_data", value={"device_id": 1, "temperature": 15.0, "humidity": 5.2, "pressure": 1016.8, "date_hours": "2026-01-16 12:00:00"})
-# add_data("weather_data", value={"device_id": 2, "temperature": 12.3, "humidity": 3.5, "pressure": 1018.0, "date_hours": "2026-01-16 12:00:00"})
-# add_data("weather_data", value={"device_id": 1, "temperature": 14.5, "humidity": 5.0, "pressure": 1017.0, "date_hours": "2026-01-16 13:00:00"})
-# add_data("weather_data", value={"device_id": 2, "temperature": 13.1, "humidity": 4.0, "pressure": 1017.5, "date_hours": "2026-01-16 13:00:00"})
+# add_data("weather_data", value={"device_id": 1, "temperature": 15.0, "humidity": 5.2, "pressure": 1016.8, "date": "2026-01-16","hour": "12:00:00"})
+# add_data("weather_data", value={"device_id": 2, "temperature": 12.3, "humidity": 3.5, "pressure": 1018.0, "date": "2026-01-16","hour": "12:00:00"})
+# add_data("weather_data", value={"device_id": 1, "temperature": 14.5, "humidity": 5.0, "pressure": 1017.0, "date": "2026-01-16","hour": "13:00:00"})
+# add_data("weather_data", value={"device_id": 2, "temperature": 13.1, "humidity": 4.0, "pressure": 1017.5, "date": "2026-01-16","hour": "13:00:00"})

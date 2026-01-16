@@ -7,12 +7,12 @@ async function loadHistory(sensorId) {
         const data = await response.json();
 
         // Vérifier que les listes existent
-        const { date, temperature, humidity, pressure } = data;
-        if (!date || !temperature || !humidity || !pressure) {
+        const { date, hour, temperature, humidity, pressure } = data;
+        if (!date ||!hour || !temperature || !humidity || !pressure) {
             throw new Error('Données incomplètes reçues');
         }
 
-        const maxLength = Math.max(date.length, temperature.length, humidity.length, pressure.length);
+        const maxLength = Math.max(date.length,hour.length, temperature.length, humidity.length, pressure.length);
         const tbody = document.getElementById(`history${sensorId}-body`);
         tbody.innerHTML = ''; // Vider le contenu existant
         // Générer les lignes
@@ -20,6 +20,7 @@ async function loadHistory(sensorId) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${date[i] !== undefined ? date[i] : '—'}</td>
+                <td>${hour[i] !== undefined ? hour[i] : '—'}</td>
                 <td>${temperature[i] !== undefined ? temperature[i] + ' °C' : '—'}</td>
                 <td>${humidity[i] !== undefined ? humidity[i] + ' %' : '—'}</td>
                 <td>${pressure[i] !== undefined ? pressure[i] + ' hPa' : '—'}</td>
