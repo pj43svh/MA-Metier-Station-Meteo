@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 
@@ -35,13 +36,10 @@ def history():
 @app.route("/statistical")
 def statistical():
     
-    create_graph_line("temperature1","timestamp",label_x="heures",label_y="°C",titre="Temperatures")
-    create_graph_line("pressure1","timestamp",label_x="heures",label_y="hPa",titre="Pressures")
-    create_graph_bar("humidity1","timestamp",label_x="heures",label_y="%",titre="Humidity levels")
+    create_graph_line(["temperature1","temperature2"],"timestamp",label_x="",label_y="°C",line_title=["Sensor 1","Sensor 2"],title="Temperatures", color =["tab:blue","tab:red"])
+    create_graph_line(["pressure1","pressure2"],"timestamp",label_x="",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"])
+    create_graph_bar(["humidity1","humidity2"],"timestamp",label_x="",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"])
 
-    create_graph_line("temperature2","timestamp",label_x="heures",label_y="°C",titre="Temperatures")
-    create_graph_line("pressure2","timestamp",label_x="heures",label_y="hPa",titre="Pressures")
-    create_graph_bar("humidity2","timestamp",label_x="heures",label_y="%",titre="Humidity levels")
 
     return render_template('statistical.html')
 
@@ -54,13 +52,15 @@ def statistical():
 def inject_timestamp():
     return {"timestamp": lambda: int(time.time())}
 
-def create_graph_line(var,echelle,label_x="abscissa",label_y="ordored",titre="Title",x=10,y=5,couleur="tab:blue"):
+def create_graph_line(var,echelle,label_x="abscissa",label_y="ordored",line_title=["title of line"] ,title="Title",x=10,y=5,color=["tab:blue"]):
     with open(json_file_path, 'r') as json_file:
         data = json.load(json_file)
 
     plt.figure(figsize=(x, y))
-    plt.plot(data.get(echelle), data.get(var)[-len(data.get(echelle)):], marker='o', color=couleur, label=titre)
-    plt.title(titre)
+    for i in range(len(var)):
+        plt.plot(data.get(echelle), data.get(var[i])[-len(data.get(echelle)):], marker='o', color=color[i], label=line_title[i])
+    
+    plt.title(title)
     plt.xlabel(label_x)
     plt.ylabel(label_y)
     plt.xticks(rotation=45)
@@ -72,7 +72,7 @@ def create_graph_line(var,echelle,label_x="abscissa",label_y="ordored",titre="Ti
     static_dir = os.path.join(BASE_DIR, 'static')
     os.makedirs(static_dir, exist_ok=True)
 
-    file_path = os.path.join(static_dir, f"graph_{var}.png")
+    file_path = os.path.join(static_dir, f"graph_{title}.png")
 
     try:
         plt.savefig(file_path)
@@ -83,16 +83,27 @@ def create_graph_line(var,echelle,label_x="abscissa",label_y="ordored",titre="Ti
         plt.close()
         return "Erreur interne — impossible de générer le graphique", 500
     
-def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",titre="Title",x=10,y=5,couleur="tab:blue"):
+def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=["title of bar"],title="Title",x=10,y=5,color=["tab:blue"]):
     with open(json_file_path, 'r') as json_file:
         data = json.load(json_file)
 
     plt.figure(figsize=(x, y))
-    plt.bar(data.get(echelle), data.get(var)[-len(data.get(echelle)):], color=couleur, label=titre)
-    plt.title(titre)
+    
+    n = len(var)
+    bar_width = 0.8 / n
+    x_positions = np.arange(len(data.get(echelle)))
+    for i in range(n):
+        offset = (i - n/2 + 0.5) * bar_width
+        plt.bar(x_positions + offset,
+                data.get(var[i])[-len(data.get(echelle)):], 
+                width=bar_width, 
+                color=color[i], 
+                label=bar_title[i], 
+                alpha=0.7)
+    plt.xticks(x_positions, data.get(echelle), rotation=45, ha='right')
+    plt.title(title)
     plt.xlabel(label_x)
     plt.ylabel(label_y)
-    plt.xticks(rotation=45)
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
@@ -101,7 +112,7 @@ def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",titre="Titl
     static_dir = os.path.join(BASE_DIR, 'static')
     os.makedirs(static_dir, exist_ok=True)
 
-    file_path = os.path.join(static_dir, f"graph_{var}.png")
+    file_path = os.path.join(static_dir, f"graph_{title}.png")
 
     try:
         plt.savefig(file_path)

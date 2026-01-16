@@ -76,25 +76,29 @@ nav li a:hover {
     display: flex;
 }
 
-.donnee {
+.data {
     background-color: #424242;
     padding: 10px;
     border-radius: 10px;
     margin: 10px;
 }
 
-.donnee h2 {
+.data h2 {
     margin: 5px;
     font-size: 1.5em;
 }
 
-.donnee p {
+.data p {
     font-size: 3em;
     margin: 10px;
     padding: 8px;
     background-color: #7a7a7a;
     border-radius: 10px;
     text-align: center;
+}
+
+.data p:hover{
+    background: #505050;
 }
 
 canvas {
