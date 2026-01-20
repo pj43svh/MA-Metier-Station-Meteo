@@ -3,7 +3,12 @@ function updateData() {
     fetch('/api/temperature1')
         .then(response => response.text())
         .then(text => {
-            document.getElementById('temperature1').textContent = text + ' °C';
+            console.log("Temp1:", text);
+            if (text === "NULL") {
+                document.getElementById('temperature1').textContent = '-- °C';
+            } else {
+                document.getElementById('temperature1').textContent = text + ' °C';
+        }
     });
 
     fetch('/api/pressure1')

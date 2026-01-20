@@ -34,6 +34,10 @@
     </nav>
     <div>
         <h1>HISTORY</h1>
+            <select name="date" id="date">
+                <option value="today" selected>Today</option>
+            </select>
+            <input type="button" value="Refresh" id="refresh_btn">
         <div class="content">
         <section id="history1" class="card">
             <div class="history-card">
@@ -42,6 +46,7 @@
                     <thead>
                         <tr>
                             <th>Date</th>
+                            <th>Hour</th>
                             <th>Temperature</th>
                             <th>Humidity (%)</th>
                             <th>Pressure (hPa)</th>

@@ -4,34 +4,26 @@ import sqlite3
 def get_db_connection():
     """Retourne une connexion SQLite (thread-safe)"""
     conn = sqlite3.connect("weather_data.db")
-    conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
 def create_tables():
-    """Crée les tables si elles n’existent pas"""
+    """Crée les tables si elles n’existent pas
+    Le nom de la table est l'adresse ip de l'appareil"""
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS device (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        type TEXT NOT NULL,
-        address_ip TEXT NOT NULL UNIQUE
-    );
-    """)
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS weather_data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        temperature REAL,
-        humidity REAL,
-        pressure REAL,
-        date TEXT NOT NULL,
-        hour TEXT NOT NULL,
-        device_id INTEGER NOT NULL,
-        FOREIGN KEY (device_id) REFERENCES device (id) ON DELETE NO ACTION ON UPDATE NO ACTION
-    );
-    """)
+    name = ["esp1","esp2"]
+    for i in name :
+        cursor.execute(f"""
+        CREATE TABLE IF NOT EXISTS {i} ( 
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            temperature REAL,
+            humidity REAL,
+            pressure REAL,
+            date TEXT NOT NULL,
+            hour TEXT NOT NULL
+        );
+        """)
 
     conn.commit()
     conn.close()
@@ -50,13 +42,15 @@ def add_data(table, value={}):
     conn.commit()
     conn.close()
 
-def read_data(table, column="*", where=None):
+def read_data(table, column="*", where=None,order=None):
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
         command = f"SELECT {column} FROM `{table}`"
         if where:
             command += f" WHERE {where}"
+        if order:
+            command += f" ORDER BY {order}"
         cursor.execute(command)
         results = cursor.fetchall()
         return results
@@ -67,9 +61,3 @@ def read_data(table, column="*", where=None):
 create_tables()
 
 # Exemple d'ajout (décommenter si besoin)
-# add_data("device", value={"type": "ESP32", "address_ip": "192.168.1.32"})
-# add_data("device", value={"type": "ESP32", "address_ip": "192.168.1.33"})
-# add_data("weather_data", value={"device_id": 1, "temperature": 15.0, "humidity": 5.2, "pressure": 1016.8, "date": "2026-01-16","hour": "12:00:00"})
-# add_data("weather_data", value={"device_id": 2, "temperature": 12.3, "humidity": 3.5, "pressure": 1018.0, "date": "2026-01-16","hour": "12:00:00"})
-# add_data("weather_data", value={"device_id": 1, "temperature": 14.5, "humidity": 5.0, "pressure": 1017.0, "date": "2026-01-16","hour": "13:00:00"})
-# add_data("weather_data", value={"device_id": 2, "temperature": 13.1, "humidity": 4.0, "pressure": 1017.5, "date": "2026-01-16","hour": "13:00:00"})

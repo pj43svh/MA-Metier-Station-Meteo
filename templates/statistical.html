@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="/static/style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="10"> <!-- Rafraîchit toutes les 30s -->
+    <meta http-equiv="refresh" content="10"> <!-- Rafraîchit toutes les 10s -->
     <title>Weather station - Statistical</title>
     <link rel="icon" type="image/x-icon" href="/static/icone.png">
 </head>
@@ -35,6 +35,11 @@
     </nav>
     <div>
         <h1>STATISTICAL</h1>
+        
+            <select name="date" id="date">
+                <option value="today" selected>Today</option>
+            </select>
+            <input type="button" value="Refresh" id="refresh_btn">
 
         <div class="content">
             <div class="sensors">
