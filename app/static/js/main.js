@@ -147,7 +147,6 @@ function renderCapteurCard(capteur) {
             <div class="sensor-measurements">
                 ${renderMeasurement(mesures.temperature, 'Température', '🌡️', '°C')}
                 ${renderMeasurement(mesures.humidite, 'Humidité', '💧', '%')}
-                ${renderMeasurement(mesures.luminosite, 'Luminosité', '☀️', 'lux')}
                 ${renderMeasurement(mesures.pression, 'Pression', '🌀', 'hPa')}
             </div>
         </div>

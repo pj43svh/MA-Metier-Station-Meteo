@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 from datetime import datetime
-from app import db
-from app.models import Capteur, Mesure
+from app import get_db
 
 main = Blueprint('main', __name__)
 api = Blueprint('api', __name__)
@@ -11,7 +10,7 @@ api = Blueprint('api', __name__)
 
 @main.route('/')
 def dashboard():
-    """Page principale - Dashboard météo"""
+    """Page principale - Dashboard meteo"""
     return render_template('dashboard.html')
 
 
@@ -21,9 +20,24 @@ def dashboard():
 
 @api.route('/capteurs', methods=['GET'])
 def get_capteurs():
-    """Liste tous les capteurs enregistrés"""
-    capteurs = Capteur.query.all()
-    return jsonify([c.to_dict() for c in capteurs])
+    """Liste tous les capteurs enregistres"""
+    db = get_db()
+    cursor = db.execute('SELECT * FROM capteur')
+    capteurs = cursor.fetchall()
+
+    # Convertit en liste de dictionnaires
+    result = []
+    for c in capteurs:
+        result.append({
+            'id': c['id'],
+            'esp_id': c['esp_id'],
+            'nom': c['nom'],
+            'localisation': c['localisation'],
+            'actif': bool(c['actif']),
+            'derniere_connexion': c['derniere_connexion']
+        })
+
+    return jsonify(result)
 
 
 @api.route('/capteurs', methods=['POST'])
@@ -34,46 +48,53 @@ def add_capteur():
     if not data or 'esp_id' not in data or 'nom' not in data:
         return jsonify({'error': 'esp_id et nom requis'}), 400
 
-    # Vérifie si le capteur existe déjà
-    existing = Capteur.query.filter_by(esp_id=data['esp_id']).first()
+    db = get_db()
+
+    # Verifie si le capteur existe deja
+    existing = db.execute('SELECT * FROM capteur WHERE esp_id = ?', (data['esp_id'],)).fetchone()
     if existing:
-        return jsonify({'error': 'Capteur déjà enregistré', 'capteur': existing.to_dict()}), 409
+        return jsonify({'error': 'Capteur deja enregistre'}), 409
 
-    capteur = Capteur(
-        esp_id=data['esp_id'],
-        nom=data['nom'],
-        localisation=data.get('localisation', '')
+    # Insere le nouveau capteur
+    cursor = db.execute(
+        'INSERT INTO capteur (esp_id, nom, localisation) VALUES (?, ?, ?)',
+        (data['esp_id'], data['nom'], data.get('localisation', ''))
     )
-    db.session.add(capteur)
-    db.session.commit()
+    db.commit()
 
-    return jsonify(capteur.to_dict()), 201
+    return jsonify({'message': 'Capteur ajoute', 'id': cursor.lastrowid}), 201
 
 
 @api.route('/capteurs/<int:id>', methods=['PUT'])
 def update_capteur(id):
-    """Met à jour un capteur"""
-    capteur = Capteur.query.get_or_404(id)
+    """Met a jour un capteur"""
     data = request.get_json()
+    db = get_db()
 
+    # Verifie que le capteur existe
+    capteur = db.execute('SELECT * FROM capteur WHERE id = ?', (id,)).fetchone()
+    if not capteur:
+        return jsonify({'error': 'Capteur non trouve'}), 404
+
+    # Met a jour les champs fournis
     if 'nom' in data:
-        capteur.nom = data['nom']
+        db.execute('UPDATE capteur SET nom = ? WHERE id = ?', (data['nom'], id))
     if 'localisation' in data:
-        capteur.localisation = data['localisation']
+        db.execute('UPDATE capteur SET localisation = ? WHERE id = ?', (data['localisation'], id))
     if 'actif' in data:
-        capteur.actif = data['actif']
+        db.execute('UPDATE capteur SET actif = ? WHERE id = ?', (1 if data['actif'] else 0, id))
 
-    db.session.commit()
-    return jsonify(capteur.to_dict())
+    db.commit()
+    return jsonify({'message': 'Capteur mis a jour'})
 
 
 @api.route('/capteurs/<int:id>', methods=['DELETE'])
 def delete_capteur(id):
     """Supprime un capteur"""
-    capteur = Capteur.query.get_or_404(id)
-    db.session.delete(capteur)
-    db.session.commit()
-    return jsonify({'message': 'Capteur supprimé'})
+    db = get_db()
+    db.execute('DELETE FROM capteur WHERE id = ?', (id,))
+    db.commit()
+    return jsonify({'message': 'Capteur supprime'})
 
 
 # --- Mesures ---
@@ -81,75 +102,112 @@ def delete_capteur(id):
 @api.route('/mesures', methods=['POST'])
 def add_mesure():
     """
-    Endpoint pour recevoir les données des ESP32
+    Recoit les donnees de l'ESP32
+
     Format attendu:
     {
-        "esp_id": "ESP32_001",
-        "mesures": [
-            {"type": "temperature", "valeur": 22.5, "unite": "°C"},
-            {"type": "humidite", "valeur": 65, "unite": "%"}
-        ]
+        "capteur_id": "ATOM_001",
+        "temperature": 22.5,
+        "humidite": 65.0,
+        "pression": 1013.25
     }
     """
     data = request.get_json()
 
-    if not data or 'esp_id' not in data or 'mesures' not in data:
-        return jsonify({'error': 'Format invalide'}), 400
+    if not data:
+        return jsonify({'error': 'Donnees manquantes'}), 400
 
-    # Trouve le capteur
-    capteur = Capteur.query.filter_by(esp_id=data['esp_id']).first()
+    if 'capteur_id' not in data:
+        return jsonify({'error': 'capteur_id requis'}), 400
+
+    db = get_db()
+    esp_id = data['capteur_id']
+
+    # Cherche le capteur ou le cree automatiquement
+    capteur = db.execute('SELECT * FROM capteur WHERE esp_id = ?', (esp_id,)).fetchone()
+
     if not capteur:
-        return jsonify({'error': 'Capteur non enregistré'}), 404
+        # Auto-enregistrement du capteur
+        cursor = db.execute(
+            'INSERT INTO capteur (esp_id, nom, localisation) VALUES (?, ?, ?)',
+            (esp_id, f'Capteur {esp_id}', 'Non defini')
+        )
+        db.commit()
+        capteur_id = cursor.lastrowid
+    else:
+        capteur_id = capteur['id']
 
-    # Met à jour la dernière connexion
-    capteur.derniere_connexion = datetime.utcnow()
+    # Met a jour la derniere connexion
+    db.execute(
+        'UPDATE capteur SET derniere_connexion = ? WHERE id = ?',
+        (datetime.now().isoformat(), capteur_id)
+    )
 
     # Enregistre les mesures
-    mesures_ajoutees = []
-    for m in data['mesures']:
-        mesure = Mesure(
-            capteur_id=capteur.id,
-            type_mesure=m['type'],
-            valeur=m['valeur'],
-            unite=m.get('unite', '')
-        )
-        db.session.add(mesure)
-        mesures_ajoutees.append(mesure)
+    mesures_count = 0
 
-    db.session.commit()
+    if 'temperature' in data:
+        db.execute(
+            'INSERT INTO mesure (capteur_id, type_mesure, valeur, unite) VALUES (?, ?, ?, ?)',
+            (capteur_id, 'temperature', data['temperature'], 'C')
+        )
+        mesures_count += 1
+
+    if 'humidite' in data:
+        db.execute(
+            'INSERT INTO mesure (capteur_id, type_mesure, valeur, unite) VALUES (?, ?, ?, ?)',
+            (capteur_id, 'humidite', data['humidite'], '%')
+        )
+        mesures_count += 1
+
+    if 'pression' in data:
+        db.execute(
+            'INSERT INTO mesure (capteur_id, type_mesure, valeur, unite) VALUES (?, ?, ?, ?)',
+            (capteur_id, 'pression', data['pression'], 'hPa')
+        )
+        mesures_count += 1
+
+    db.commit()
 
     return jsonify({
-        'message': f'{len(mesures_ajoutees)} mesure(s) enregistrée(s)',
-        'mesures': [m.to_dict() for m in mesures_ajoutees]
+        'message': f'{mesures_count} mesure(s) enregistree(s)',
+        'capteur_id': capteur_id
     }), 201
 
 
 @api.route('/mesures/latest', methods=['GET'])
 def get_latest_mesures():
-    """Récupère les dernières mesures de chaque capteur"""
-    capteurs = Capteur.query.filter_by(actif=True).all()
+    """Recupere les dernieres mesures de chaque capteur"""
+    db = get_db()
+
+    # Recupere tous les capteurs actifs
+    capteurs = db.execute('SELECT * FROM capteur WHERE actif = 1').fetchall()
+
     result = []
-
     for capteur in capteurs:
-        capteur_data = capteur.to_dict()
-        capteur_data['mesures'] = {}
+        capteur_data = {
+            'id': capteur['id'],
+            'esp_id': capteur['esp_id'],
+            'nom': capteur['nom'],
+            'localisation': capteur['localisation'],
+            'actif': bool(capteur['actif']),
+            'derniere_connexion': capteur['derniere_connexion'],
+            'mesures': {}
+        }
 
-        # Récupère la dernière mesure de chaque type
-        types_mesures = db.session.query(Mesure.type_mesure).filter_by(
-            capteur_id=capteur.id
-        ).distinct().all()
+        # Recupere la derniere mesure de chaque type
+        for type_mesure in ['temperature', 'humidite', 'pression']:
+            mesure = db.execute('''
+                SELECT valeur, unite, timestamp FROM mesure
+                WHERE capteur_id = ? AND type_mesure = ?
+                ORDER BY timestamp DESC LIMIT 1
+            ''', (capteur['id'], type_mesure)).fetchone()
 
-        for (type_mesure,) in types_mesures:
-            derniere = Mesure.query.filter_by(
-                capteur_id=capteur.id,
-                type_mesure=type_mesure
-            ).order_by(Mesure.timestamp.desc()).first()
-
-            if derniere:
+            if mesure:
                 capteur_data['mesures'][type_mesure] = {
-                    'valeur': derniere.valeur,
-                    'unite': derniere.unite,
-                    'timestamp': derniere.timestamp.isoformat()
+                    'valeur': mesure['valeur'],
+                    'unite': mesure['unite'],
+                    'timestamp': mesure['timestamp']
                 }
 
         result.append(capteur_data)
@@ -159,15 +217,34 @@ def get_latest_mesures():
 
 @api.route('/mesures/historique/<int:capteur_id>', methods=['GET'])
 def get_historique(capteur_id):
-    """Récupère l'historique des mesures d'un capteur"""
+    """Recupere l'historique des mesures d'un capteur"""
     limite = request.args.get('limite', 100, type=int)
     type_mesure = request.args.get('type', None)
 
-    query = Mesure.query.filter_by(capteur_id=capteur_id)
+    db = get_db()
 
     if type_mesure:
-        query = query.filter_by(type_mesure=type_mesure)
+        mesures = db.execute('''
+            SELECT * FROM mesure
+            WHERE capteur_id = ? AND type_mesure = ?
+            ORDER BY timestamp DESC LIMIT ?
+        ''', (capteur_id, type_mesure, limite)).fetchall()
+    else:
+        mesures = db.execute('''
+            SELECT * FROM mesure
+            WHERE capteur_id = ?
+            ORDER BY timestamp DESC LIMIT ?
+        ''', (capteur_id, limite)).fetchall()
 
-    mesures = query.order_by(Mesure.timestamp.desc()).limit(limite).all()
+    result = []
+    for m in mesures:
+        result.append({
+            'id': m['id'],
+            'capteur_id': m['capteur_id'],
+            'type_mesure': m['type_mesure'],
+            'valeur': m['valeur'],
+            'unite': m['unite'],
+            'timestamp': m['timestamp']
+        })
 
-    return jsonify([m.to_dict() for m in mesures])
+    return jsonify(result)
