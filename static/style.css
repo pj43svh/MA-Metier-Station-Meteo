@@ -138,8 +138,10 @@ canvas {
         width: auto;
     }
     .card{
-        width: 100%;
+        padding : auto;
     }
+    .graphique
+    { width: 100%;}
 
 }
 

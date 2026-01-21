@@ -1,6 +1,9 @@
 from database import add_data
-from flask import request, Blueprint
+from flask import request, Blueprint, jsonify
+from werkzeug.exceptions import InternalServerError
+
 from datetime import datetime
+
 
 esp = Blueprint("esp",__name__)
 
@@ -18,19 +21,23 @@ def esp_request():
     pressure = data.get('pression')
 
     date_now = datetime.now().strftime("%Y-%m-%d")
-    hour_now = datetime.now().strftime("%H:%M")
+    hour_now = datetime.now().strftime("%H:%M:%S")
 
-    print(name,temperature,humidity,pressure,date_now,hour_now)
-    if name == "Atom_001":
+    if name == "ATOM_001":
         name = "esp1"
-    elif name == "Atom_002":
+    elif name == "ATOM_002":
         name = "esp2"
     else :
         print("Wrong device name : ", name)
         return
     
 
-    add_data(name, value={"temperature":temperature,"humidity":humidity,"pressure":pressure,"date":date_now,"hour":hour_now})
+    result = add_data(name, value={"temperature":temperature,"humidity":humidity,"pressure":pressure,"date":date_now,"hour":hour_now})
+    
+    if result :
+        return jsonify({"Serveur local":"Succès"}), 201
+    else :
+        return InternalServerError("Erreur lors de l'ajout de données dans la DB")
 
     
 

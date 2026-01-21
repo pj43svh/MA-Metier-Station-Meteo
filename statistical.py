@@ -9,14 +9,19 @@ import os
 #######################___PARTIE DEDIEE AU GRAPHIQUE___########################
 ###############################################################################
 
-def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=["Line 1"], title="Title", x=10, y=5, color=["tab:blue"],date="today",limit=24):
+def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=["Line 1"], title="Title", x=10, y=5, color=["tab:blue"],date="today",limit=100):
     from api import api_datas_list
+
     hour = api_datas_list(echelle,limit=limit,date_filter=date)
+
     if not hour:
         print(f"❌ Aucune date trouvée pour {echelle}")
         return
 
+    x = limit/5
     plt.figure(figsize=(x, y))
+    plt.margins(x=0.01, y=0.01)
+
     for i in range(len(var)):
         values = api_datas_list(var[i],limit=limit,date_filter=date)
         if not values:
@@ -29,7 +34,7 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
     plt.title(f"{title} | {date}")
     plt.xlabel(label_x)
     plt.ylabel(label_y)
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=90)
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
@@ -53,10 +58,14 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
 
 
 
-def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=["title of bar"],title="Title",x=10,y=5,color=["tab:blue"],limit=24,date="today"):
+def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=["title of bar"],title="Title",x=10,y=5,color=["tab:blue"],limit=100,date="today"):
+
     from api import api_datas_list
+
+    x = limit/5
     plt.figure(figsize=(x, y))
-    
+    plt.margins(x=0.01, y=0.01)
+
     n = len(var)
     bar_width = 0.8 / n
     x_positions = np.arange(len(api_datas_list(echelle,limit=limit,date_filter=date)))
@@ -68,7 +77,7 @@ def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=[
                 color=color[i], 
                 label=bar_title[i], 
                 alpha=0.7)
-    plt.xticks(x_positions,api_datas_list(echelle,limit=limit,date_filter=date), rotation=45, ha='right')
+    plt.xticks(x_positions,api_datas_list(echelle,limit=limit,date_filter=date), rotation=90, ha='right')
     plt.title(f"{title} | {date}")
     plt.xlabel(label_x)
     plt.ylabel(label_y)

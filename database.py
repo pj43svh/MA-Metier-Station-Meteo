@@ -41,6 +41,7 @@ def add_data(table, value={}):
     cursor.execute(command, values)
     conn.commit()
     conn.close()
+    return True
 
 def read_data(table, column="*", where=None,order=None):
     conn = get_db_connection()

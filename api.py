@@ -34,7 +34,7 @@ def api_data(type_str):
     else:
         return "Aucune donnée"
     
-def api_datas_list(type_str, limit=24,date_filter="today"):
+def api_datas_list(type_str, limit=100,date_filter="today"):
     """Retourne une liste des dernières valeurs pour une colonne"""
     if type_str == "hour":
         col = "hour"
@@ -156,11 +156,11 @@ def get_history1():
         selected_date = request.args.get("date",type=str)
     except:
         selected_date = "today"
-    date_list = api_datas_list("date", limit=24, date_filter=selected_date)
-    hour_list = api_datas_list("hour", limit=24, date_filter=selected_date)
-    temp_list = api_datas_list("temperature1", limit=24, date_filter=selected_date)
-    hum_list = api_datas_list("humidity1", limit=24, date_filter=selected_date)
-    press_list = api_datas_list("pressure1", limit=24, date_filter=selected_date)
+    date_list = api_datas_list("date", limit=50, date_filter=selected_date)
+    hour_list = api_datas_list("hour", limit=50, date_filter=selected_date)
+    temp_list = api_datas_list("temperature1", limit=50, date_filter=selected_date)
+    hum_list = api_datas_list("humidity1", limit=50, date_filter=selected_date)
+    press_list = api_datas_list("pressure1", limit=50, date_filter=selected_date)
 
     return jsonify({
         "date": date_list,
@@ -179,11 +179,11 @@ def get_history2():
     except:
         selected_date = "today"
     
-    date_list = api_datas_list("date", limit=24, date_filter=selected_date)
-    hour_list = api_datas_list("hour", limit=24, date_filter=selected_date)
-    temp_list = api_datas_list("temperature2", limit=24, date_filter=selected_date)
-    hum_list = api_datas_list("humidity2", limit=24, date_filter=selected_date)
-    press_list = api_datas_list("pressure2", limit=24, date_filter=selected_date)
+    date_list = api_datas_list("date", limit=50, date_filter=selected_date)
+    hour_list = api_datas_list("hour", limit=50, date_filter=selected_date)
+    temp_list = api_datas_list("temperature2", limit=50, date_filter=selected_date)
+    hum_list = api_datas_list("humidity2", limit=50, date_filter=selected_date)
+    press_list = api_datas_list("pressure2", limit=50, date_filter=selected_date)
 
     return jsonify({
         "date": date_list,
