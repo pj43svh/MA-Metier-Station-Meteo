@@ -1,8 +1,12 @@
+# Ce script sert à envoyer la bonne page quand l'utilisateur va sur un lien
+# Exemple : /about => about.html
+
 from flask import Blueprint,render_template
 
 
 
 route = Blueprint("route",__name__)
+
 ###############################################################################
 ####################___PARTIE DEDIEE AUX CHEMIN DES PAGES___###################
 ###############################################################################
@@ -12,9 +16,9 @@ route = Blueprint("route",__name__)
 def index():
     return render_template("index.html")
 
-@route.route("/about")
-def about():
-    return render_template("about.html")
+@route.route("/about") # ici, quand l'utilisateur va aller sur /about
+def about(): # la fonction about va être appelée
+    return render_template("about.html") # et la page about.html va être affichée.
 
 @route.route("/history")
 def history():

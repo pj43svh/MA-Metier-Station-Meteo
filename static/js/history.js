@@ -1,6 +1,6 @@
-// Fonction pour charger les données depuis l'API Flask
-let date_selected = "today";
+let date_selected = "today"; // valeur par défaut
 
+// Fonction pour charger les données depuis l'API Flask
 async function loadHistory(sensorId, dateFilter = "today") {
     try {
         const url = `/api/history${sensorId}?date=${dateFilter}`;
@@ -82,6 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
     refresh_date();
 });
 
-// Actualiser toutes les 10 secondes
-setInterval(() => loadHistory("1",date_selected = date_selected), 10000);
-setInterval(() => loadHistory("2",date_selected = date_selected), 10000);
+// Actualiser toutes les 20 secondes
+setInterval(() => loadHistory("1",date_selected = date_selected), 20000);
+setInterval(() => loadHistory("2",date_selected = date_selected), 20000);

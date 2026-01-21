@@ -8,8 +8,11 @@ from api import api
 from route import route
 from esp import esp
 
-app.register_blueprint(api, url_prefix='/api')
+# Les blueprints serevnt à séparer les différentes parties de l'application
+# Quand on va sur /api/quelquechose, ça va aller dans api.py puis sur les
+# routes définies dans là bas.
 app.register_blueprint(route, url_prefix='/')
+app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(esp, url_prefix='/request')
 
 

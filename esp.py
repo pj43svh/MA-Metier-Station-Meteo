@@ -21,6 +21,8 @@ def esp_request():
     hour_now = datetime.now().strftime("%H:%M")
 
     print(name,temperature,humidity,pressure,date_now,hour_now)
+    
+    # IMPORTANAT : changer le nom du device pour qu'il corresponde à la BDD
     if name == "Atom_001":
         name = "esp1"
     elif name == "Atom_002":
