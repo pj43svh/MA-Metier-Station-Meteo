@@ -9,8 +9,11 @@ import os
 #######################___PARTIE DEDIEE AU GRAPHIQUE___########################
 ###############################################################################
 
-def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=["Line 1"], title="Title", x=10, y=5, color=["tab:blue"],date="today",limit=100):
-    from api import api_datas_list
+def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=["Line 1"], title="Title", x=10, y=5, color=["tab:blue"],date="today",limit=24):
+    """
+    Cette fonction sert a créer un graphique de type linéaire
+    """
+    from api import api_datas_list # on utilise la fonction api_datas_list pour récupérer 24 données selon la date
 
     hour = api_datas_list(echelle,limit=limit,date_filter=date)
 
@@ -42,15 +45,15 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     static_dir = os.path.join(BASE_DIR, 'static')
     os.makedirs(static_dir, exist_ok=True)
-
-    file_path = os.path.join(static_dir, f"graph_{title}.png")
+    # On sauvegarde le graphique avec le titre du graphique. l'ancien se fait écraser.
+    file_path = os.path.join(static_dir, f"graph_{title}.png") 
 
     try:
         plt.savefig(file_path)
         plt.close()
-        print(f"✅ Graphique sauvegardé à : {file_path}")
+        print(f"Graphique sauvegardé à : {file_path}")
     except Exception as e:
-        print(f"❌ Erreur lors de la sauvegarde : {e}")
+        print(f"Erreur lors de la sauvegarde : {e}")
         plt.close()
         return "Erreur interne — impossible de générer le graphique", 500
 # exemple d'utilisation
@@ -58,8 +61,10 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
 
 
 
-def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=["title of bar"],title="Title",x=10,y=5,color=["tab:blue"],limit=100,date="today"):
-
+def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=["title of bar"],title="Title",x=10,y=5,color=["tab:blue"],limit=24,date="today"):
+    """
+    Cette fonction sert a créer un graphique de type barres
+    """
     from api import api_datas_list
 
     x = limit/5
@@ -94,9 +99,9 @@ def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=[
     try:
         plt.savefig(file_path)
         plt.close()
-        print(f"✅ Graphique sauvegardé à : {file_path}")
+        print(f"Graphique sauvegardé à : {file_path}")
     except Exception as e:
-        print(f"❌ Erreur lors de la sauvegarde : {e}")
+        print(f"Erreur lors de la sauvegarde : {e}")
         plt.close()
         return "Erreur interne — impossible de générer le graphique", 500
 

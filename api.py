@@ -11,7 +11,7 @@ api = Blueprint("api",__name__)
 
 
 def api_data(type_str):
-    # Extraire colonne et device_id
+    """Retourne la dernière valeur pour une colonne"""
     col = type_str[:-1]
     device_name = "esp"+type_str[-1]
 
@@ -51,7 +51,7 @@ def api_datas_list(type_str, limit=100,date_filter="today"):
     if col not in ALLOWED_COLUMNS:
         return []
 
-    # ✅ Tri par id DESC (du plus récent au plus ancien)
+    # Tri par id DESC (du plus récent au plus ancien)
     if date_filter == "today":
         results = db.read_data(
             device_name,
