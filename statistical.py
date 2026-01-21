@@ -26,7 +26,7 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
         values = values[-len(hour):]  # Prendre les dernières valeurs
         plt.plot(hour, values, marker='o', color=color[i], label=line_title[i])
 
-    plt.title(title)
+    plt.title(f"{title} | {date}")
     plt.xlabel(label_x)
     plt.ylabel(label_y)
     plt.xticks(rotation=45)
@@ -69,7 +69,7 @@ def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=[
                 label=bar_title[i], 
                 alpha=0.7)
     plt.xticks(x_positions,api_datas_list(echelle,limit=limit,date_filter=date), rotation=45, ha='right')
-    plt.title(title)
+    plt.title(f"{title} | {date}")
     plt.xlabel(label_x)
     plt.ylabel(label_y)
     plt.grid(True, alpha=0.3)

@@ -79,6 +79,7 @@ if (refreshBtn) {
 }
 document.addEventListener('DOMContentLoaded', () => {
     loadDates(); // 👈 Charger les dates au chargement
+    refresh_date();
 });
 
 // Actualiser toutes les 10 secondes

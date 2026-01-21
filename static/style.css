@@ -95,10 +95,11 @@ nav li a:hover {
     background-color: #7a7a7a;
     border-radius: 10px;
     text-align: center;
+	animation: scale-down-center 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
 .data p:hover{
-    background: #505050;
+    animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
 }
 
 canvas {
@@ -172,8 +173,13 @@ thead{
     font-weight: bold;
 }
 
-.history-table tr:hover {
+.history-table tbody tr:hover {
     background: #505050;
+    animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+}
+.history-table tbody tr{
+    animation: scale-down-center 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+    background: #7a7a7a;
 }
 
 .card {
@@ -203,4 +209,67 @@ thead{
     padding: 10px;
     border-radius: 10px;
     margin: 10px;
+}
+
+select, input[type=button]{
+    background-color: #424242;
+    color: #cfcfcf;
+    border: #505050 2px solid;
+    border-radius: 5px;
+        animation: scale-down-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+
+}
+
+select:hover, input[type=button]:hover{
+    background-color: #505050;
+    animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+
+}
+input[type=button].jello{
+    background-color: #313131;
+	animation: jello-horizontal 0.9s both;
+
+}
+
+
+@keyframes scale-up-center {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes scale-down-center {
+  0% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes jello-horizontal {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+  30% {
+    transform: scale3d(1.25, 0.75, 1);
+  }
+  40% {
+    transform: scale3d(0.75, 1.25, 1);
+  }
+  50% {
+    transform: scale3d(1.15, 0.85, 1);
+  }
+  65% {
+    transform: scale3d(0.95, 1.05, 1);
+  }
+  75% {
+    transform: scale3d(1.05, 0.95, 1);
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
 }

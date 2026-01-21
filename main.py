@@ -6,9 +6,11 @@ app = Flask(__name__)
 
 from api import api
 from route import route
+from esp import esp
 
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(route, url_prefix='/')
+app.register_blueprint(esp, url_prefix='/request')
 
 
 ###############################################################################

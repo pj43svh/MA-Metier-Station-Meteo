@@ -5,8 +5,6 @@ from statistical import create_graph_bar,create_graph_line
 api = Blueprint("api",__name__)
 
 
-
-
 ###############################################################################
 ##########################___PARTIE DEDIEE A L'API___##########################
 ###############################################################################
@@ -206,3 +204,4 @@ def refresh_statistical():
     create_graph_line(["temperature1","temperature2"],"hour",label_x="Hours",label_y="°C",line_title=["Sensor 1","Sensor 2"],title="Temperatures", color =["tab:blue","tab:red"],date=selected_date)
     create_graph_line(["pressure1","pressure2"],"hour",label_x="Hours",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"],date=selected_date)
     create_graph_bar(["humidity1","humidity2"],"hour",label_x="Hours",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"],date=selected_date)
+    return "refresh",200

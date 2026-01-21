@@ -4,6 +4,8 @@ async function refresh_statistical( dateFilter="today") {
         const url = `/api/statistical_refresh?date=${dateFilter}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Erreur du serveur');
+        // reload the current page
+        window.location.reload();
 }
     
 
@@ -38,8 +40,8 @@ async function refresh_date() {
     const select_list = document.getElementById("date");
     console.log("button pressed ", select_list.value);
     date_selected = document.getElementById("date").value;
-    refresh_statistical("1",date_selected = date_selected);
-    refresh_statistical("2",date_selected = date_selected);
+    refresh_statistical(dateFilter = date_selected);
+    refresh_statistical(dateFilter = date_selected);
 }
 
 // Attacher l'événement au bouton, si présent
@@ -48,8 +50,20 @@ if (refreshBtn) {
     refreshBtn.addEventListener("click", refresh_date);
 }
 document.addEventListener('DOMContentLoaded', () => {
-    loadDates(); // 👈 Charger les dates au chargement
+    loadDates(); // Charger les dates au chargement
+    loadHistory();
 });
 
 // Actualiser toutes les 10 secondes
 setInterval(() => refresh_statistical(dateFilter = date_selected), 10000);
+
+// petit script inutile pour rendre le bouton swag
+document.querySelectorAll('input[type=button]').forEach(button => {
+  button.addEventListener('click', function() {
+    this.classList.add('jello');
+    // Supprime la classe après la fin de l'animation pour permettre une nouvelle animation
+    this.addEventListener('animationend', function() {
+      this.classList.remove('jello');
+    }, { once: true });
+  });
+});
