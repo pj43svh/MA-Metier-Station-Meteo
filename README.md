@@ -28,7 +28,7 @@ si jamais, j'ai utilisé 0% d'ia  -->
 
 ## 📦 Matériel necessaire
 
-- Un raspberry pi 4/5 (min 4Gb ram)
+- Un raspberry pi 
 - Un/plusieurs ESP 32 wroom 32
 - Capteur d'humidité
 
