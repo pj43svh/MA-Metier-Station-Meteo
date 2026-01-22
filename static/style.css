@@ -275,3 +275,94 @@ input[type=button].jello{
     transform: scale3d(1, 1, 1);
   }
 }
+
+/* ==================== STATUT DES CAPTEURS ==================== */
+
+.sensor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sensor-header h1 {
+    margin: 0;
+}
+
+.sensor-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #424242;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.online {
+    background-color: #4caf50;
+    box-shadow: 0 0 8px #4caf50;
+    animation: pulse-green 2s infinite;
+}
+
+.status-dot.recent {
+    background-color: #ff9800;
+    box-shadow: 0 0 8px #ff9800;
+}
+
+.status-dot.offline {
+    background-color: #f44336;
+}
+
+.status-text {
+    font-size: 0.85em;
+    color: #cfcfcf;
+}
+
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 4px #4caf50;
+    }
+    50% {
+        box-shadow: 0 0 12px #4caf50;
+    }
+    100% {
+        box-shadow: 0 0 4px #4caf50;
+    }
+}
+
+.no-sensors {
+    text-align: center;
+    padding: 40px;
+    background-color: #424242;
+    border-radius: 10px;
+    margin: 20px;
+}
+
+.no-sensors h2 {
+    color: #ff9800;
+    margin-bottom: 10px;
+}
+
+.no-sensors p {
+    color: #cfcfcf;
+    margin: 5px 0;
+}
+
+.no-sensors .hint {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: 15px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+}

@@ -13,6 +13,7 @@
  */
 
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <WiFiManager.h>
 #include <HTTPClient.h>
 #include <Wire.h>
@@ -23,8 +24,8 @@
 #define CAPTEUR_ID "ATOM_001"           // Identifiant du capteur
 #define SEND_INTERVAL 20000              // Intervalle d'envoi (20 sec)
 
-// Adresse IP du serveur Raspberry Pi (a modifier selon ton reseau)
-String SERVER_URL = "http://192.168.1.100:5000/request";
+// URL du serveur Railway (cloud)
+String SERVER_URL = "https://nurturing-achievement-production.up.railway.app/request/";
 
 // ==================== PINS ====================
 #define BUTTON_PIN 39                    // Bouton sur Atom Lite
@@ -181,9 +182,21 @@ bool initSensors() {
 }
 
 void sendData(float temp, float hum, float press) {
-    HTTPClient http;
+    WiFiClientSecure client;
+    client.setInsecure();  // Desactive la verification du certificat SSL
+    client.setTimeout(30000);  // Timeout de 30 secondes pour SSL
+    client.setHandshakeTimeout(30);  // Timeout handshake SSL en secondes
 
-    http.begin(SERVER_URL);
+    HTTPClient http;
+    http.setTimeout(30000);  // Timeout HTTP de 30 secondes
+    http.setConnectTimeout(30000);  // Timeout connexion de 30 secondes
+
+    Serial.println("Connexion HTTPS en cours...");
+
+    if (!http.begin(client, SERVER_URL)) {
+        Serial.println("Erreur: Impossible d'initialiser la connexion HTTP");
+        return;
+    }
     http.addHeader("Content-Type", "application/json");
 
     // Construction du JSON

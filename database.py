@@ -114,5 +114,41 @@ def get_sensor_count():
     return len(get_all_sensors())
 
 
+def get_sensor_last_activity(table_name):
+    """
+    Retourne la date et l'heure de la derniere activite d'un capteur.
+    """
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT date, hour FROM `{table_name}` ORDER BY id DESC LIMIT 1")
+        result = cursor.fetchone()
+        if result:
+            return {"date": result[0], "hour": result[1]}
+        return None
+    except Exception as e:
+        print(f"Erreur lecture activite {table_name}: {e}")
+        return None
+    finally:
+        conn.close()
+
+
+def get_all_sensors_status():
+    """
+    Retourne le statut de tous les capteurs avec leur derniere activite.
+    """
+    sensors = get_all_sensors()
+    status_list = []
+
+    for sensor in sensors:
+        last_activity = get_sensor_last_activity(sensor)
+        status_list.append({
+            "name": sensor,
+            "last_activity": last_activity
+        })
+
+    return status_list
+
+
 # Appelle create_tables() au demarrage
 create_tables()

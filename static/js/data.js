@@ -9,15 +9,21 @@
 const sensorsContainer = document.querySelector('.content');
 
 /**
- * Cree le HTML pour un capteur
+ * Cree le HTML pour un capteur avec indicateur de statut
  */
-function createSensorCard(sensorNum) {
+function createSensorCard(sensorNum, status = 'offline', statusText = 'Inconnu') {
     const card = document.createElement('div');
     card.className = 'sensors';
     card.id = `sensor${sensorNum}`;
 
     card.innerHTML = `
-        <h1>Sensor ${sensorNum}</h1>
+        <div class="sensor-header">
+            <h1>Sensor ${sensorNum}</h1>
+            <div class="sensor-status">
+                <span class="status-dot ${status}" id="status-dot-${sensorNum}"></span>
+                <span class="status-text" id="status-text-${sensorNum}">${statusText}</span>
+            </div>
+        </div>
 
         <div class="data">
             <h2>Temperature :</h2>
@@ -39,21 +45,21 @@ function createSensorCard(sensorNum) {
 }
 
 /**
- * Charge la liste des capteurs et cree les cartes
+ * Charge la liste des capteurs avec leur statut
  */
 async function loadSensors() {
     try {
-        const response = await fetch('/api/sensors');
+        // Utiliser la nouvelle API de statut
+        const response = await fetch('/api/sensors/status');
         const data = await response.json();
 
         // Vider le conteneur
         sensorsContainer.innerHTML = '';
 
         if (data.sensors && data.sensors.length > 0) {
-            // Creer une carte pour chaque capteur
+            // Creer une carte pour chaque capteur avec son statut
             data.sensors.forEach(sensor => {
-                const sensorNum = sensor.replace('esp', '');
-                const card = createSensorCard(sensorNum);
+                const card = createSensorCard(sensor.number, sensor.status, sensor.status_text);
                 sensorsContainer.appendChild(card);
             });
         } else {
@@ -62,6 +68,7 @@ async function loadSensors() {
                 <div class="no-sensors">
                     <h2>Aucun capteur detecte</h2>
                     <p>En attente de donnees des ESP32...</p>
+                    <p class="hint">Les capteurs apparaitront automatiquement quand ils enverront des donnees.</p>
                 </div>
             `;
         }
@@ -71,11 +78,49 @@ async function loadSensors() {
 
     } catch (error) {
         console.error('Erreur chargement capteurs:', error);
-        // Fallback: afficher 2 capteurs par defaut
-        sensorsContainer.innerHTML = '';
-        sensorsContainer.appendChild(createSensorCard(1));
-        sensorsContainer.appendChild(createSensorCard(2));
+        // Fallback vers l'ancienne API
+        try {
+            const response = await fetch('/api/sensors');
+            const data = await response.json();
+            sensorsContainer.innerHTML = '';
+            if (data.sensors && data.sensors.length > 0) {
+                data.sensors.forEach(sensor => {
+                    const sensorNum = sensor.replace('esp', '');
+                    const card = createSensorCard(sensorNum);
+                    sensorsContainer.appendChild(card);
+                });
+            }
+        } catch (e) {
+            // Dernier recours: afficher 2 capteurs par defaut
+            sensorsContainer.innerHTML = '';
+            sensorsContainer.appendChild(createSensorCard(1));
+            sensorsContainer.appendChild(createSensorCard(2));
+        }
         updateDataLegacy();
+    }
+}
+
+/**
+ * Met a jour uniquement le statut des capteurs (sans recharger les cartes)
+ */
+async function updateSensorStatus() {
+    try {
+        const response = await fetch('/api/sensors/status');
+        const data = await response.json();
+
+        data.sensors.forEach(sensor => {
+            const dot = document.getElementById(`status-dot-${sensor.number}`);
+            const text = document.getElementById(`status-text-${sensor.number}`);
+
+            if (dot) {
+                dot.className = `status-dot ${sensor.status}`;
+            }
+            if (text) {
+                text.textContent = sensor.status_text;
+            }
+        });
+    } catch (error) {
+        console.error('Erreur mise a jour statut:', error);
     }
 }
 
@@ -179,3 +224,6 @@ setInterval(loadSensors, 60000);
 
 // Mettre a jour les donnees toutes les 20 secondes
 setInterval(updateData, 20000);
+
+// Mettre a jour le statut toutes les 30 secondes
+setInterval(updateSensorStatus, 30000);

@@ -14,6 +14,7 @@
  */
 
 #include <WiFi.h>
+#include <WiFiClientSecure.h>
 #include <WiFiManager.h>
 #include <HTTPClient.h>
 #include <Wire.h>
@@ -38,8 +39,7 @@ Preferences preferences;
 
 // ==================== VARIABLES CONFIGURABLES ====================
 char capteurNumero[3] = "1";             // Numero du capteur (1, 2, 3...)
-char serverIP[40] = "192.168.1.100";     // IP du serveur Raspberry
-char serverPort[6] = "5000";             // Port du serveur
+char serverURL_base[80] = "https://nurturing-achievement-production.up.railway.app";  // URL du serveur Railway
 
 // ==================== VARIABLES ====================
 unsigned long lastSendTime = 0;
@@ -75,7 +75,7 @@ void setup() {
     // Construire l'ID et le nom du reseau WiFi
     capteurID = "ATOM_00" + String(capteurNumero);
     apName = "METEO_CAPTEUR_" + String(capteurNumero);
-    serverURL = "http://" + String(serverIP) + ":" + String(serverPort) + "/request";
+    serverURL = String(serverURL_base) + "/request/";
 
     Serial.println("\n========================================");
     Serial.println("   Station Meteo - Capteur " + String(capteurNumero));
@@ -93,12 +93,10 @@ void setup() {
 
     // Parametres WiFiManager personnalises
     WiFiManagerParameter custom_capteur_num("capteur", "Numero du capteur (1, 2, 3...)", capteurNumero, 3);
-    WiFiManagerParameter custom_server_ip("server", "IP du serveur Raspberry", serverIP, 40);
-    WiFiManagerParameter custom_server_port("port", "Port du serveur", serverPort, 6);
+    WiFiManagerParameter custom_server_url("server", "URL du serveur (ex: https://example.up.railway.app)", serverURL_base, 80);
 
     wifiManager.addParameter(&custom_capteur_num);
-    wifiManager.addParameter(&custom_server_ip);
-    wifiManager.addParameter(&custom_server_port);
+    wifiManager.addParameter(&custom_server_url);
 
     // Callback quand la config est sauvegardee
     wifiManager.setSaveConfigCallback([]() {
@@ -118,13 +116,12 @@ void setup() {
 
         // Recuperer les valeurs entrees
         strcpy(capteurNumero, custom_capteur_num.getValue());
-        strcpy(serverIP, custom_server_ip.getValue());
-        strcpy(serverPort, custom_server_port.getValue());
+        strcpy(serverURL_base, custom_server_url.getValue());
 
         // Sauvegarder et reconstruire
         saveConfig();
         capteurID = "ATOM_00" + String(capteurNumero);
-        serverURL = "http://" + String(serverIP) + ":" + String(serverPort) + "/request";
+        serverURL = String(serverURL_base) + "/request/";
 
         setLED(false);  // LED off = pret
     } else {
@@ -186,22 +183,19 @@ void loop() {
 void loadConfig() {
     preferences.begin("meteo", true);  // Read-only
     String num = preferences.getString("capteur", "1");
-    String ip = preferences.getString("serverIP", "192.168.1.100");
-    String port = preferences.getString("serverPort", "5000");
+    String url = preferences.getString("serverURL", "https://nurturing-achievement-production.up.railway.app");
     preferences.end();
 
     num.toCharArray(capteurNumero, 3);
-    ip.toCharArray(serverIP, 40);
-    port.toCharArray(serverPort, 6);
+    url.toCharArray(serverURL_base, 80);
 
-    Serial.println("Config chargee: Capteur " + num + ", IP " + ip + ":" + port);
+    Serial.println("Config chargee: Capteur " + num + ", URL " + url);
 }
 
 void saveConfig() {
     preferences.begin("meteo", false);  // Read-write
     preferences.putString("capteur", capteurNumero);
-    preferences.putString("serverIP", serverIP);
-    preferences.putString("serverPort", serverPort);
+    preferences.putString("serverURL", serverURL_base);
     preferences.end();
 
     Serial.println("Config sauvegardee!");
@@ -240,9 +234,21 @@ bool initSensors() {
 }
 
 void sendData(float temp, float hum, float press) {
-    HTTPClient http;
+    WiFiClientSecure client;
+    client.setInsecure();  // Desactive la verification du certificat SSL
+    client.setTimeout(30000);  // Timeout de 30 secondes pour SSL
+    client.setHandshakeTimeout(30);  // Timeout handshake SSL en secondes
 
-    http.begin(serverURL);
+    HTTPClient http;
+    http.setTimeout(30000);  // Timeout HTTP de 30 secondes
+    http.setConnectTimeout(30000);  // Timeout connexion de 30 secondes
+
+    Serial.println("Connexion HTTPS en cours...");
+
+    if (!http.begin(client, serverURL)) {
+        Serial.println("Erreur: Impossible d'initialiser la connexion HTTP");
+        return;
+    }
     http.addHeader("Content-Type", "application/json");
 
     // Construction du JSON

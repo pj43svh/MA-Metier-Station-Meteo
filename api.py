@@ -19,6 +19,63 @@ def get_sensors():
     return jsonify({"sensors": sensors, "count": len(sensors)})
 
 
+@api.route("/sensors/status")
+def get_sensors_status():
+    """
+    Retourne le statut de tous les capteurs avec leur derniere activite.
+    Un capteur est considere "online" s'il a envoye des donnees dans les 2 dernieres minutes.
+    """
+    from datetime import datetime, timedelta
+
+    sensors_status = db.get_all_sensors_status()
+    result = []
+
+    now = datetime.now()
+
+    for sensor in sensors_status:
+        sensor_info = {
+            "id": sensor["name"],
+            "number": sensor["name"].replace("esp", ""),
+            "last_date": None,
+            "last_hour": None,
+            "status": "offline",
+            "status_text": "Jamais connecte"
+        }
+
+        if sensor["last_activity"]:
+            last_date = sensor["last_activity"]["date"]
+            last_hour = sensor["last_activity"]["hour"]
+            sensor_info["last_date"] = last_date
+            sensor_info["last_hour"] = last_hour
+
+            # Calculer si le capteur est online (derniere activite < 2 minutes)
+            try:
+                last_datetime = datetime.strptime(f"{last_date} {last_hour}", "%Y-%m-%d %H:%M:%S")
+                diff = now - last_datetime
+
+                if diff.total_seconds() < 120:  # 2 minutes
+                    sensor_info["status"] = "online"
+                    sensor_info["status_text"] = "En ligne"
+                elif diff.total_seconds() < 300:  # 5 minutes
+                    sensor_info["status"] = "recent"
+                    sensor_info["status_text"] = f"Vu il y a {int(diff.total_seconds() // 60)} min"
+                else:
+                    sensor_info["status"] = "offline"
+                    minutes = int(diff.total_seconds() // 60)
+                    if minutes < 60:
+                        sensor_info["status_text"] = f"Hors ligne ({minutes} min)"
+                    elif minutes < 1440:
+                        sensor_info["status_text"] = f"Hors ligne ({minutes // 60}h)"
+                    else:
+                        sensor_info["status_text"] = f"Hors ligne ({minutes // 1440}j)"
+            except Exception as e:
+                sensor_info["status_text"] = f"Derniere activite: {last_hour}"
+
+        result.append(sensor_info)
+
+    return jsonify({"sensors": result, "count": len(result), "timestamp": now.strftime("%Y-%m-%d %H:%M:%S")})
+
+
 @api.route("/sensor/<int:sensor_id>/latest")
 def get_sensor_latest(sensor_id):
     """
