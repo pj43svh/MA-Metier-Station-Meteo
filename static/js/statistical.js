@@ -43,7 +43,6 @@ async function refresh_date() {
     console.log("button pressed ", select_list.value);
     date_selected = document.getElementById("date").value;
     refresh_statistical(dateFilter = date_selected);
-    refresh_statistical(dateFilter = date_selected);
 }
 
 // Attacher l'événement au bouton, si présent

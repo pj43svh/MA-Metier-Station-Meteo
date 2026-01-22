@@ -6,6 +6,176 @@ api = Blueprint("api",__name__)
 
 
 ###############################################################################
+#######################___NOUVELLE API DYNAMIQUE___############################
+###############################################################################
+
+@api.route("/sensors")
+def get_sensors():
+    """
+    Retourne la liste de tous les capteurs enregistres.
+    Exemple: {"sensors": ["esp1", "esp2", "esp3"], "count": 3}
+    """
+    sensors = db.get_all_sensors()
+    return jsonify({"sensors": sensors, "count": len(sensors)})
+
+
+@api.route("/sensors/status")
+def get_sensors_status():
+    """
+    Retourne le statut de tous les capteurs avec leur derniere activite.
+    Un capteur est considere "online" s'il a envoye des donnees dans les 2 dernieres minutes.
+    """
+    from datetime import datetime, timedelta
+
+    sensors_status = db.get_all_sensors_status()
+    result = []
+
+    now = datetime.now()
+
+    for sensor in sensors_status:
+        sensor_info = {
+            "id": sensor["name"],
+            "number": sensor["name"].replace("esp", ""),
+            "last_date": None,
+            "last_hour": None,
+            "status": "offline",
+            "status_text": "Jamais connecte"
+        }
+
+        if sensor["last_activity"]:
+            last_date = sensor["last_activity"]["date"]
+            last_hour = sensor["last_activity"]["hour"]
+            sensor_info["last_date"] = last_date
+            sensor_info["last_hour"] = last_hour
+
+            # Calculer si le capteur est online (derniere activite < 2 minutes)
+            try:
+                last_datetime = datetime.strptime(f"{last_date} {last_hour}", "%Y-%m-%d %H:%M:%S")
+                diff = now - last_datetime
+
+                if diff.total_seconds() < 120:  # 2 minutes
+                    sensor_info["status"] = "online"
+                    sensor_info["status_text"] = "En ligne"
+                elif diff.total_seconds() < 300:  # 5 minutes
+                    sensor_info["status"] = "recent"
+                    sensor_info["status_text"] = f"Vu il y a {int(diff.total_seconds() // 60)} min"
+                else:
+                    sensor_info["status"] = "offline"
+                    minutes = int(diff.total_seconds() // 60)
+                    if minutes < 60:
+                        sensor_info["status_text"] = f"Hors ligne ({minutes} min)"
+                    elif minutes < 1440:
+                        sensor_info["status_text"] = f"Hors ligne ({minutes // 60}h)"
+                    else:
+                        sensor_info["status_text"] = f"Hors ligne ({minutes // 1440}j)"
+            except Exception as e:
+                sensor_info["status_text"] = f"Derniere activite: {last_hour}"
+
+        result.append(sensor_info)
+
+    return jsonify({"sensors": result, "count": len(result), "timestamp": now.strftime("%Y-%m-%d %H:%M:%S")})
+
+
+@api.route("/sensor/<int:sensor_id>/latest")
+def get_sensor_latest(sensor_id):
+    """
+    Retourne les dernieres valeurs d'un capteur.
+    Exemple: /api/sensor/1/latest -> donnees du capteur esp1
+    """
+    table_name = f"esp{sensor_id}"
+
+    # Verifier si le capteur existe
+    if table_name not in db.get_all_sensors():
+        return jsonify({"error": f"Capteur {sensor_id} non trouve"}), 404
+
+    try:
+        temp = db.read_data(table_name, column="temperature", order="id DESC LIMIT 1")
+        hum = db.read_data(table_name, column="humidity", order="id DESC LIMIT 1")
+        press = db.read_data(table_name, column="pressure", order="id DESC LIMIT 1")
+        date = db.read_data(table_name, column="date", order="id DESC LIMIT 1")
+        hour = db.read_data(table_name, column="hour", order="id DESC LIMIT 1")
+
+        return jsonify({
+            "sensor": sensor_id,
+            "temperature": temp[0][0] if temp else None,
+            "humidity": hum[0][0] if hum else None,
+            "pressure": press[0][0] if press else None,
+            "date": date[0][0] if date else None,
+            "hour": hour[0][0] if hour else None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route("/sensor/<int:sensor_id>/history")
+def get_sensor_history(sensor_id):
+    """
+    Retourne l'historique d'un capteur.
+    Parametres optionnels: ?date=2026-01-22&limit=50
+    """
+    table_name = f"esp{sensor_id}"
+
+    if table_name not in db.get_all_sensors():
+        return jsonify({"error": f"Capteur {sensor_id} non trouve"}), 404
+
+    selected_date = request.args.get("date", type=str)
+    limit = request.args.get("limit", default=50, type=int)
+
+    try:
+        if selected_date:
+            where_clause = f"date = '{selected_date}'"
+            temp = db.read_data(table_name, column="temperature", where=where_clause, order=f"id DESC LIMIT {limit}")
+            hum = db.read_data(table_name, column="humidity", where=where_clause, order=f"id DESC LIMIT {limit}")
+            press = db.read_data(table_name, column="pressure", where=where_clause, order=f"id DESC LIMIT {limit}")
+            dates = db.read_data(table_name, column="date", where=where_clause, order=f"id DESC LIMIT {limit}")
+            hours = db.read_data(table_name, column="hour", where=where_clause, order=f"id DESC LIMIT {limit}")
+        else:
+            temp = db.read_data(table_name, column="temperature", order=f"id DESC LIMIT {limit}")
+            hum = db.read_data(table_name, column="humidity", order=f"id DESC LIMIT {limit}")
+            press = db.read_data(table_name, column="pressure", order=f"id DESC LIMIT {limit}")
+            dates = db.read_data(table_name, column="date", order=f"id DESC LIMIT {limit}")
+            hours = db.read_data(table_name, column="hour", order=f"id DESC LIMIT {limit}")
+
+        return jsonify({
+            "sensor": sensor_id,
+            "temperature": [r[0] for r in temp][::-1],
+            "humidity": [r[0] for r in hum][::-1],
+            "pressure": [r[0] for r in press][::-1],
+            "date": [r[0] for r in dates][::-1],
+            "hour": [r[0] for r in hours][::-1]
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route("/all/latest")
+def get_all_latest():
+    """
+    Retourne les dernieres valeurs de TOUS les capteurs.
+    Utile pour le dashboard.
+    """
+    sensors = db.get_all_sensors()
+    result = {}
+
+    for sensor in sensors:
+        sensor_num = sensor.replace("esp", "")
+        try:
+            temp = db.read_data(sensor, column="temperature", order="id DESC LIMIT 1")
+            hum = db.read_data(sensor, column="humidity", order="id DESC LIMIT 1")
+            press = db.read_data(sensor, column="pressure", order="id DESC LIMIT 1")
+
+            result[sensor] = {
+                "temperature": temp[0][0] if temp else None,
+                "humidity": hum[0][0] if hum else None,
+                "pressure": press[0][0] if press else None
+            }
+        except:
+            result[sensor] = {"temperature": None, "humidity": None, "pressure": None}
+
+    return jsonify(result)
+
+
+###############################################################################
 ##########################___PARTIE DEDIEE A L'API___##########################
 ###############################################################################
 
@@ -38,10 +208,13 @@ def api_datas_list(type_str, limit=100,date_filter="today"):
     """Retourne une liste des dernières valeurs pour une colonne"""
     if type_str == "hour":
         col = "hour"
-        device_name = "esp1"
+        # Trouver un capteur qui a des donnees pour l'axe des heures
+        sensors = db.get_all_sensors()
+        device_name = sensors[0] if sensors else "esp1"
     elif type_str == "date":
         col = "date"
-        device_name = "esp1"
+        sensors = db.get_all_sensors()
+        device_name = sensors[0] if sensors else "esp1"
     else:
         col = type_str[:-1]
         device_name = "esp"+type_str[-1]
@@ -205,3 +378,146 @@ def refresh_statistical():
     create_graph_line(["pressure1","pressure2"],"hour",label_x="Hours",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"],date=selected_date)
     create_graph_bar(["humidity1","humidity2"],"hour",label_x="Hours",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"],date=selected_date)
     return "refresh",200
+
+
+###############################################################################
+####################___API ADMIN - GESTION DES ESP32___########################
+###############################################################################
+
+@api.route("/esp32/register", methods=["POST"])
+def register_esp32():
+    """
+    Endpoint appele par les ESP32 pour s'enregistrer.
+    L'ESP32 envoie son adresse MAC et recoit son numero de capteur.
+    """
+    data = request.get_json()
+
+    if not data or "mac_address" not in data:
+        return jsonify({"error": "mac_address requis"}), 400
+
+    mac_address = data["mac_address"]
+    ip_address = data.get("ip_address", request.remote_addr)
+
+    # Enregistrer l'ESP32 et recuperer son numero de capteur
+    sensor_number = db.register_esp32(mac_address, ip_address)
+
+    if sensor_number:
+        # ESP32 deja configure
+        return jsonify({
+            "status": "configured",
+            "sensor_number": sensor_number,
+            "capteur_id": f"ATOM_00{sensor_number}"
+        })
+    else:
+        # ESP32 pas encore configure
+        return jsonify({
+            "status": "pending",
+            "message": "En attente de configuration via l'interface admin"
+        })
+
+
+@api.route("/esp32/config/<mac_address>")
+def get_esp32_config(mac_address):
+    """
+    Retourne la configuration d'un ESP32 par son adresse MAC.
+    """
+    config = db.get_esp32_config(mac_address)
+
+    if config and config["sensor_number"]:
+        return jsonify({
+            "status": "configured",
+            "sensor_number": config["sensor_number"],
+            "capteur_id": f"ATOM_00{config['sensor_number']}",
+            "name": config["name"]
+        })
+    else:
+        return jsonify({
+            "status": "pending",
+            "message": "Non configure"
+        })
+
+
+@api.route("/esp32/devices")
+def list_esp32_devices():
+    """
+    Retourne la liste de tous les ESP32 enregistres.
+    Pour l'interface admin.
+    """
+    from datetime import datetime
+
+    devices = db.get_all_esp32_devices()
+    now = datetime.now()
+
+    for device in devices:
+        # Calculer le statut en ligne/hors ligne
+        if device["last_seen"]:
+            try:
+                last_seen = datetime.strptime(device["last_seen"], "%Y-%m-%d %H:%M:%S")
+                diff = (now - last_seen).total_seconds()
+
+                if diff < 120:
+                    device["status"] = "online"
+                    device["status_text"] = "En ligne"
+                elif diff < 300:
+                    device["status"] = "recent"
+                    device["status_text"] = f"Vu il y a {int(diff // 60)} min"
+                else:
+                    device["status"] = "offline"
+                    minutes = int(diff // 60)
+                    if minutes < 60:
+                        device["status_text"] = f"Hors ligne ({minutes} min)"
+                    elif minutes < 1440:
+                        device["status_text"] = f"Hors ligne ({minutes // 60}h)"
+                    else:
+                        device["status_text"] = f"Hors ligne ({minutes // 1440}j)"
+            except:
+                device["status"] = "unknown"
+                device["status_text"] = "Inconnu"
+        else:
+            device["status"] = "unknown"
+            device["status_text"] = "Jamais vu"
+
+    return jsonify({"devices": devices, "count": len(devices)})
+
+
+@api.route("/esp32/configure", methods=["POST"])
+def configure_esp32():
+    """
+    Configure un ESP32 (assigne un numero de capteur).
+    """
+    data = request.get_json()
+
+    if not data or "mac_address" not in data or "sensor_number" not in data:
+        return jsonify({"error": "mac_address et sensor_number requis"}), 400
+
+    mac_address = data["mac_address"]
+    sensor_number = data["sensor_number"]
+    name = data.get("name", f"Capteur {sensor_number}")
+
+    success = db.set_esp32_sensor_number(mac_address, sensor_number, name)
+
+    if success:
+        return jsonify({
+            "status": "success",
+            "message": f"ESP32 configure comme Capteur {sensor_number}"
+        })
+    else:
+        return jsonify({"error": "ESP32 non trouve"}), 404
+
+
+@api.route("/esp32/delete", methods=["POST"])
+def delete_esp32():
+    """
+    Supprime un ESP32 de la base de donnees.
+    """
+    data = request.get_json()
+
+    if not data or "mac_address" not in data:
+        return jsonify({"error": "mac_address requis"}), 400
+
+    success = db.delete_esp32_device(data["mac_address"])
+
+    if success:
+        return jsonify({"status": "success", "message": "ESP32 supprime"})
+    else:
+        return jsonify({"error": "ESP32 non trouve"}), 404
