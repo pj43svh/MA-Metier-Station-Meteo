@@ -25,8 +25,17 @@ def history():
     return render_template("history.html")
 
 
-
 @route.route("/statistical")
 def statistical():
     
     return render_template('statistical.html')
+
+@route.route("/login")
+def login():
+    
+    return render_template('account/login.html')
+
+@route.route("/signup")
+def signup():
+    
+    return render_template('account/signup.html')

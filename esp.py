@@ -1,3 +1,8 @@
+# Auteur : Théo Läderach
+# Dernière modification : 21.01.2025
+# Modifications : correction de la gestion des erreurs
+# Fonction : recevoir les requêtes POST des ESP32 et ajouter les données à la base de données
+
 from database import add_data
 from flask import request, Blueprint, jsonify
 from werkzeug.exceptions import InternalServerError
@@ -29,7 +34,7 @@ def esp_request():
         name = "esp2"
     else :
         print("Wrong device name : ", name)
-        return
+    
     
 
     result = add_data(name, value={"temperature":temperature,"humidity":humidity,"pressure":pressure,"date":date_now,"hour":hour_now})
@@ -38,7 +43,4 @@ def esp_request():
         return jsonify({"Serveur local":"Succès"}), 201
     else :
         return InternalServerError("Erreur lors de l'ajout de données dans la DB")
-
-    
-
 
