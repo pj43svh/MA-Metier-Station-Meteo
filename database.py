@@ -1,9 +1,12 @@
 import sqlite3
+import os
 
+# Chemin de la base de donnees (configurable via variable d'environnement pour Railway)
+DB_PATH = os.environ.get('DATABASE_PATH', 'weather_data.db')
 
 def get_db_connection():
     """Retourne une connexion SQLite (thread-safe)"""
-    conn = sqlite3.connect("weather_data.db")
+    conn = sqlite3.connect(DB_PATH)
     return conn
 
 def create_tables():
@@ -111,5 +114,5 @@ def get_sensor_count():
     return len(get_all_sensors())
 
 
-# 🚀 Appelle create_tables() au démarrage
+# Appelle create_tables() au demarrage
 create_tables()

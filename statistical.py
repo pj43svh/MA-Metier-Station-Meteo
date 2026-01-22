@@ -18,7 +18,7 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
     hour = api_datas_list(echelle,limit=limit,date_filter=date)
 
     if not hour:
-        print(f"❌ Aucune date trouvée pour {echelle}")
+        print(f"[ERREUR] Aucune date trouvee pour {echelle}")
         return
 
     x = limit/5
@@ -28,7 +28,7 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
     for i in range(len(var)):
         values = api_datas_list(var[i],limit=limit,date_filter=date)
         if not values:
-            print(f"❌ Aucune valeur trouvée pour {var[i]}")
+            print(f"[ERREUR] Aucune valeur trouvee pour {var[i]}")
             continue
         # Ajuster la longueur des valeurs pour correspondre aux hour
         values = values[-len(hour):]  # Prendre les dernières valeurs
