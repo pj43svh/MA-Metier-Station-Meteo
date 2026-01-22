@@ -55,10 +55,61 @@ def read_data(table, column="*", where=None,order=None):
         cursor.execute(command)
         results = cursor.fetchall()
         return results
+    except Exception as e:
+        print(f"Erreur lecture table {table}: {e}")
+        return []
     finally:
         conn.close()
 
+
+def create_table_if_not_exists(table_name):
+    """
+    Cree une table pour un nouveau capteur si elle n'existe pas.
+    Permet d'ajouter des capteurs dynamiquement (esp1, esp2, esp3, esp4...)
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(f"""
+    CREATE TABLE IF NOT EXISTS {table_name} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        temperature REAL,
+        humidity REAL,
+        pressure REAL,
+        date TEXT NOT NULL,
+        hour TEXT NOT NULL
+    );
+    """)
+
+    conn.commit()
+    conn.close()
+    print(f"Table {table_name} prete")
+
+
+def get_all_sensors():
+    """
+    Retourne la liste de tous les capteurs (tables esp*) dans la base de donnees.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Recuperer toutes les tables qui commencent par 'esp'
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'esp%' ORDER BY name")
+    tables = cursor.fetchall()
+
+    conn.close()
+
+    # Extraire les noms de tables
+    sensors = [table[0] for table in tables]
+    return sensors
+
+
+def get_sensor_count():
+    """
+    Retourne le nombre de capteurs enregistres.
+    """
+    return len(get_all_sensors())
+
+
 # 🚀 Appelle create_tables() au démarrage
 create_tables()
-
-# Exemple d'ajout (décommenter si besoin)

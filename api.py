@@ -6,6 +6,119 @@ api = Blueprint("api",__name__)
 
 
 ###############################################################################
+#######################___NOUVELLE API DYNAMIQUE___############################
+###############################################################################
+
+@api.route("/sensors")
+def get_sensors():
+    """
+    Retourne la liste de tous les capteurs enregistres.
+    Exemple: {"sensors": ["esp1", "esp2", "esp3"], "count": 3}
+    """
+    sensors = db.get_all_sensors()
+    return jsonify({"sensors": sensors, "count": len(sensors)})
+
+
+@api.route("/sensor/<int:sensor_id>/latest")
+def get_sensor_latest(sensor_id):
+    """
+    Retourne les dernieres valeurs d'un capteur.
+    Exemple: /api/sensor/1/latest -> donnees du capteur esp1
+    """
+    table_name = f"esp{sensor_id}"
+
+    # Verifier si le capteur existe
+    if table_name not in db.get_all_sensors():
+        return jsonify({"error": f"Capteur {sensor_id} non trouve"}), 404
+
+    try:
+        temp = db.read_data(table_name, column="temperature", order="id DESC LIMIT 1")
+        hum = db.read_data(table_name, column="humidity", order="id DESC LIMIT 1")
+        press = db.read_data(table_name, column="pressure", order="id DESC LIMIT 1")
+        date = db.read_data(table_name, column="date", order="id DESC LIMIT 1")
+        hour = db.read_data(table_name, column="hour", order="id DESC LIMIT 1")
+
+        return jsonify({
+            "sensor": sensor_id,
+            "temperature": temp[0][0] if temp else None,
+            "humidity": hum[0][0] if hum else None,
+            "pressure": press[0][0] if press else None,
+            "date": date[0][0] if date else None,
+            "hour": hour[0][0] if hour else None
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route("/sensor/<int:sensor_id>/history")
+def get_sensor_history(sensor_id):
+    """
+    Retourne l'historique d'un capteur.
+    Parametres optionnels: ?date=2026-01-22&limit=50
+    """
+    table_name = f"esp{sensor_id}"
+
+    if table_name not in db.get_all_sensors():
+        return jsonify({"error": f"Capteur {sensor_id} non trouve"}), 404
+
+    selected_date = request.args.get("date", type=str)
+    limit = request.args.get("limit", default=50, type=int)
+
+    try:
+        if selected_date:
+            where_clause = f"date = '{selected_date}'"
+            temp = db.read_data(table_name, column="temperature", where=where_clause, order=f"id DESC LIMIT {limit}")
+            hum = db.read_data(table_name, column="humidity", where=where_clause, order=f"id DESC LIMIT {limit}")
+            press = db.read_data(table_name, column="pressure", where=where_clause, order=f"id DESC LIMIT {limit}")
+            dates = db.read_data(table_name, column="date", where=where_clause, order=f"id DESC LIMIT {limit}")
+            hours = db.read_data(table_name, column="hour", where=where_clause, order=f"id DESC LIMIT {limit}")
+        else:
+            temp = db.read_data(table_name, column="temperature", order=f"id DESC LIMIT {limit}")
+            hum = db.read_data(table_name, column="humidity", order=f"id DESC LIMIT {limit}")
+            press = db.read_data(table_name, column="pressure", order=f"id DESC LIMIT {limit}")
+            dates = db.read_data(table_name, column="date", order=f"id DESC LIMIT {limit}")
+            hours = db.read_data(table_name, column="hour", order=f"id DESC LIMIT {limit}")
+
+        return jsonify({
+            "sensor": sensor_id,
+            "temperature": [r[0] for r in temp][::-1],
+            "humidity": [r[0] for r in hum][::-1],
+            "pressure": [r[0] for r in press][::-1],
+            "date": [r[0] for r in dates][::-1],
+            "hour": [r[0] for r in hours][::-1]
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route("/all/latest")
+def get_all_latest():
+    """
+    Retourne les dernieres valeurs de TOUS les capteurs.
+    Utile pour le dashboard.
+    """
+    sensors = db.get_all_sensors()
+    result = {}
+
+    for sensor in sensors:
+        sensor_num = sensor.replace("esp", "")
+        try:
+            temp = db.read_data(sensor, column="temperature", order="id DESC LIMIT 1")
+            hum = db.read_data(sensor, column="humidity", order="id DESC LIMIT 1")
+            press = db.read_data(sensor, column="pressure", order="id DESC LIMIT 1")
+
+            result[sensor] = {
+                "temperature": temp[0][0] if temp else None,
+                "humidity": hum[0][0] if hum else None,
+                "pressure": press[0][0] if press else None
+            }
+        except:
+            result[sensor] = {"temperature": None, "humidity": None, "pressure": None}
+
+    return jsonify(result)
+
+
+###############################################################################
 ##########################___PARTIE DEDIEE A L'API___##########################
 ###############################################################################
 
