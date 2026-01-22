@@ -71,14 +71,6 @@ void setup() {
     pinMode(LED_PIN, OUTPUT);
     setLED(true);  // LED on = demarrage
 
-    // Recuperer l'adresse MAC
-    macAddress = WiFi.macAddress();
-
-    Serial.println("\n========================================");
-    Serial.println("   Station Meteo - Auto-Configure");
-    Serial.println("   MAC: " + macAddress);
-    Serial.println("========================================\n");
-
     // Initialisation I2C
     Wire.begin(SDA_PIN, SCL_PIN);
 
@@ -89,10 +81,11 @@ void setup() {
     }
 
     // Connexion WiFi
-    Serial.println("Connexion WiFi...");
+    Serial.println("\nConnexion WiFi...");
     Serial.print("SSID: ");
     Serial.println(WIFI_SSID);
 
+    WiFi.mode(WIFI_STA);  // Important: definir le mode avant begin()
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     int attempts = 0;
@@ -107,6 +100,15 @@ void setup() {
         Serial.println("WiFi connecte!");
         Serial.print("IP: ");
         Serial.println(WiFi.localIP());
+
+        // Recuperer l'adresse MAC APRES connexion WiFi
+        macAddress = WiFi.macAddress();
+
+        Serial.println("\n========================================");
+        Serial.println("   Station Meteo - Auto-Configure");
+        Serial.println("   MAC: " + macAddress);
+        Serial.println("========================================\n");
+
         setLED(false);
 
         // S'enregistrer sur le serveur et recuperer la config
@@ -114,6 +116,9 @@ void setup() {
         getConfigFromServer();
     } else {
         Serial.println("Echec connexion WiFi");
+        // Recuperer MAC quand meme pour debug
+        macAddress = WiFi.macAddress();
+        Serial.println("MAC: " + macAddress);
     }
 
     Serial.println("\n--- Pret! ---");

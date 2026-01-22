@@ -208,10 +208,13 @@ def api_datas_list(type_str, limit=100,date_filter="today"):
     """Retourne une liste des dernières valeurs pour une colonne"""
     if type_str == "hour":
         col = "hour"
-        device_name = "esp1"
+        # Trouver un capteur qui a des donnees pour l'axe des heures
+        sensors = db.get_all_sensors()
+        device_name = sensors[0] if sensors else "esp1"
     elif type_str == "date":
         col = "date"
-        device_name = "esp1"
+        sensors = db.get_all_sensors()
+        device_name = sensors[0] if sensors else "esp1"
     else:
         col = type_str[:-1]
         device_name = "esp"+type_str[-1]
