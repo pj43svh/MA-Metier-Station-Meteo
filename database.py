@@ -115,8 +115,8 @@ def get_all_sensors():
 
     conn.close()
 
-    # Extraire les noms de tables
-    sensors = [table[0] for table in tables]
+    # Extraire les noms de tables (exclure esp32_devices qui est une table de config)
+    sensors = [table[0] for table in tables if table[0] != 'esp32_devices']
     return sensors
 
 
