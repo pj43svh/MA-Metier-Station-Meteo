@@ -10,7 +10,7 @@ def get_db_connection():
     return conn
 
 def create_tables():
-    """Crée les tables si elles n’existent pas
+    """Crée les tables si elles n'existent pas
     Le nom de la table est l'adresse ip de l'appareil"""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -18,7 +18,7 @@ def create_tables():
     name = ["esp1","esp2"]
     for i in name :
         cursor.execute(f"""
-        CREATE TABLE IF NOT EXISTS {i} ( 
+        CREATE TABLE IF NOT EXISTS {i} (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             temperature REAL,
             humidity REAL,
@@ -27,6 +27,19 @@ def create_tables():
             hour TEXT NOT NULL
         );
         """)
+
+    # Table pour la configuration des ESP32
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS esp32_devices (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        mac_address TEXT UNIQUE NOT NULL,
+        sensor_number INTEGER,
+        name TEXT,
+        last_seen TEXT,
+        ip_address TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
 
     conn.commit()
     conn.close()
@@ -148,6 +161,135 @@ def get_all_sensors_status():
         })
 
     return status_list
+
+
+# ==================== GESTION DES ESP32 ====================
+
+def register_esp32(mac_address, ip_address=None):
+    """
+    Enregistre un nouvel ESP32 ou met a jour son IP et last_seen.
+    Retourne le numero de capteur assigne (ou None si pas encore configure).
+    """
+    from datetime import datetime
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Verifier si l'ESP32 existe deja
+    cursor.execute("SELECT sensor_number FROM esp32_devices WHERE mac_address = ?", (mac_address,))
+    result = cursor.fetchone()
+
+    if result:
+        # Mettre a jour last_seen et IP
+        cursor.execute(
+            "UPDATE esp32_devices SET last_seen = ?, ip_address = ? WHERE mac_address = ?",
+            (now, ip_address, mac_address)
+        )
+        conn.commit()
+        conn.close()
+        return result[0]  # Retourne le sensor_number (peut etre None)
+    else:
+        # Nouvel ESP32, l'ajouter sans numero de capteur
+        cursor.execute(
+            "INSERT INTO esp32_devices (mac_address, ip_address, last_seen) VALUES (?, ?, ?)",
+            (mac_address, ip_address, now)
+        )
+        conn.commit()
+        conn.close()
+        return None  # Pas encore configure
+
+
+def get_esp32_config(mac_address):
+    """
+    Retourne la configuration d'un ESP32 par son adresse MAC.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT sensor_number, name FROM esp32_devices WHERE mac_address = ?",
+        (mac_address,)
+    )
+    result = cursor.fetchone()
+    conn.close()
+
+    if result:
+        return {"sensor_number": result[0], "name": result[1]}
+    return None
+
+
+def set_esp32_sensor_number(mac_address, sensor_number, name=None):
+    """
+    Assigne un numero de capteur a un ESP32.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if name:
+        cursor.execute(
+            "UPDATE esp32_devices SET sensor_number = ?, name = ? WHERE mac_address = ?",
+            (sensor_number, name, mac_address)
+        )
+    else:
+        cursor.execute(
+            "UPDATE esp32_devices SET sensor_number = ? WHERE mac_address = ?",
+            (sensor_number, mac_address)
+        )
+
+    conn.commit()
+    rows_affected = cursor.rowcount
+    conn.close()
+
+    # Creer la table pour ce capteur si elle n'existe pas
+    if rows_affected > 0 and sensor_number:
+        create_table_if_not_exists(f"esp{sensor_number}")
+
+    return rows_affected > 0
+
+
+def get_all_esp32_devices():
+    """
+    Retourne la liste de tous les ESP32 enregistres.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT mac_address, sensor_number, name, last_seen, ip_address, created_at
+        FROM esp32_devices
+        ORDER BY sensor_number, created_at
+    """)
+    results = cursor.fetchall()
+    conn.close()
+
+    devices = []
+    for row in results:
+        devices.append({
+            "mac_address": row[0],
+            "sensor_number": row[1],
+            "name": row[2],
+            "last_seen": row[3],
+            "ip_address": row[4],
+            "created_at": row[5]
+        })
+
+    return devices
+
+
+def delete_esp32_device(mac_address):
+    """
+    Supprime un ESP32 de la base de donnees.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM esp32_devices WHERE mac_address = ?", (mac_address,))
+    conn.commit()
+    rows_affected = cursor.rowcount
+    conn.close()
+
+    return rows_affected > 0
 
 
 # Appelle create_tables() au demarrage

@@ -375,3 +375,146 @@ def refresh_statistical():
     create_graph_line(["pressure1","pressure2"],"hour",label_x="Hours",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"],date=selected_date)
     create_graph_bar(["humidity1","humidity2"],"hour",label_x="Hours",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"],date=selected_date)
     return "refresh",200
+
+
+###############################################################################
+####################___API ADMIN - GESTION DES ESP32___########################
+###############################################################################
+
+@api.route("/esp32/register", methods=["POST"])
+def register_esp32():
+    """
+    Endpoint appele par les ESP32 pour s'enregistrer.
+    L'ESP32 envoie son adresse MAC et recoit son numero de capteur.
+    """
+    data = request.get_json()
+
+    if not data or "mac_address" not in data:
+        return jsonify({"error": "mac_address requis"}), 400
+
+    mac_address = data["mac_address"]
+    ip_address = data.get("ip_address", request.remote_addr)
+
+    # Enregistrer l'ESP32 et recuperer son numero de capteur
+    sensor_number = db.register_esp32(mac_address, ip_address)
+
+    if sensor_number:
+        # ESP32 deja configure
+        return jsonify({
+            "status": "configured",
+            "sensor_number": sensor_number,
+            "capteur_id": f"ATOM_00{sensor_number}"
+        })
+    else:
+        # ESP32 pas encore configure
+        return jsonify({
+            "status": "pending",
+            "message": "En attente de configuration via l'interface admin"
+        })
+
+
+@api.route("/esp32/config/<mac_address>")
+def get_esp32_config(mac_address):
+    """
+    Retourne la configuration d'un ESP32 par son adresse MAC.
+    """
+    config = db.get_esp32_config(mac_address)
+
+    if config and config["sensor_number"]:
+        return jsonify({
+            "status": "configured",
+            "sensor_number": config["sensor_number"],
+            "capteur_id": f"ATOM_00{config['sensor_number']}",
+            "name": config["name"]
+        })
+    else:
+        return jsonify({
+            "status": "pending",
+            "message": "Non configure"
+        })
+
+
+@api.route("/esp32/devices")
+def list_esp32_devices():
+    """
+    Retourne la liste de tous les ESP32 enregistres.
+    Pour l'interface admin.
+    """
+    from datetime import datetime
+
+    devices = db.get_all_esp32_devices()
+    now = datetime.now()
+
+    for device in devices:
+        # Calculer le statut en ligne/hors ligne
+        if device["last_seen"]:
+            try:
+                last_seen = datetime.strptime(device["last_seen"], "%Y-%m-%d %H:%M:%S")
+                diff = (now - last_seen).total_seconds()
+
+                if diff < 120:
+                    device["status"] = "online"
+                    device["status_text"] = "En ligne"
+                elif diff < 300:
+                    device["status"] = "recent"
+                    device["status_text"] = f"Vu il y a {int(diff // 60)} min"
+                else:
+                    device["status"] = "offline"
+                    minutes = int(diff // 60)
+                    if minutes < 60:
+                        device["status_text"] = f"Hors ligne ({minutes} min)"
+                    elif minutes < 1440:
+                        device["status_text"] = f"Hors ligne ({minutes // 60}h)"
+                    else:
+                        device["status_text"] = f"Hors ligne ({minutes // 1440}j)"
+            except:
+                device["status"] = "unknown"
+                device["status_text"] = "Inconnu"
+        else:
+            device["status"] = "unknown"
+            device["status_text"] = "Jamais vu"
+
+    return jsonify({"devices": devices, "count": len(devices)})
+
+
+@api.route("/esp32/configure", methods=["POST"])
+def configure_esp32():
+    """
+    Configure un ESP32 (assigne un numero de capteur).
+    """
+    data = request.get_json()
+
+    if not data or "mac_address" not in data or "sensor_number" not in data:
+        return jsonify({"error": "mac_address et sensor_number requis"}), 400
+
+    mac_address = data["mac_address"]
+    sensor_number = data["sensor_number"]
+    name = data.get("name", f"Capteur {sensor_number}")
+
+    success = db.set_esp32_sensor_number(mac_address, sensor_number, name)
+
+    if success:
+        return jsonify({
+            "status": "success",
+            "message": f"ESP32 configure comme Capteur {sensor_number}"
+        })
+    else:
+        return jsonify({"error": "ESP32 non trouve"}), 404
+
+
+@api.route("/esp32/delete", methods=["POST"])
+def delete_esp32():
+    """
+    Supprime un ESP32 de la base de donnees.
+    """
+    data = request.get_json()
+
+    if not data or "mac_address" not in data:
+        return jsonify({"error": "mac_address requis"}), 400
+
+    success = db.delete_esp32_device(data["mac_address"])
+
+    if success:
+        return jsonify({"status": "success", "message": "ESP32 supprime"})
+    else:
+        return jsonify({"error": "ESP32 non trouve"}), 404

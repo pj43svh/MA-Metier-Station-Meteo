@@ -28,5 +28,10 @@ def history():
 
 @route.route("/statistical")
 def statistical():
-    
+
     return render_template('statistical.html')
+
+
+@route.route("/admin")
+def admin():
+    return render_template("admin.html")

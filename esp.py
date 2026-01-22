@@ -1,4 +1,4 @@
-from database import add_data, create_table_if_not_exists, get_all_sensors
+from database import add_data, create_table_if_not_exists, get_all_sensors, register_esp32
 from flask import request, Blueprint, jsonify
 from werkzeug.exceptions import InternalServerError
 
@@ -24,6 +24,7 @@ def esp_request():
     temperature = data.get('temperature')
     humidity = data.get('humidite')
     pressure = data.get('pression')
+    mac_address = data.get('mac_address')  # Optionnel
 
     date_now = datetime.now().strftime("%Y-%m-%d")
     hour_now = datetime.now().strftime("%H:%M:%S")
@@ -39,6 +40,11 @@ def esp_request():
 
     # Creer la table si elle n'existe pas (nouveau capteur)
     create_table_if_not_exists(table_name)
+
+    # Mettre a jour last_seen si mac_address fourni
+    if mac_address:
+        ip_address = request.remote_addr
+        register_esp32(mac_address, ip_address)
 
     # Ajouter les donnees
     result = add_data(table_name, value={

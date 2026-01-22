@@ -25,6 +25,10 @@
 // ==================== CONFIGURATION ====================
 #define SEND_INTERVAL 20000              // Intervalle d'envoi (20 sec)
 
+// WiFi - Ton hotspot
+const char* WIFI_SSID = "Bomboclat";
+const char* WIFI_PASSWORD = "zyxouzyxou";
+
 // ==================== PINS (Atom Lite) ====================
 #define BUTTON_PIN 39                    // Bouton
 #define LED_PIN 27                       // LED
@@ -91,38 +95,25 @@ void setup() {
         // Continue quand meme pour permettre la config WiFi
     }
 
-    // Parametres WiFiManager personnalises
-    WiFiManagerParameter custom_capteur_num("capteur", "Numero du capteur (1, 2, 3...)", capteurNumero, 3);
-    WiFiManagerParameter custom_server_url("server", "URL du serveur (ex: https://example.up.railway.app)", serverURL_base, 80);
-
-    wifiManager.addParameter(&custom_capteur_num);
-    wifiManager.addParameter(&custom_server_url);
-
-    // Callback quand la config est sauvegardee
-    wifiManager.setSaveConfigCallback([]() {
-        Serial.println("Configuration sauvegardee!");
-    });
-
-    wifiManager.setConfigPortalTimeout(180);  // 3 minutes timeout
-
-    // Tentative de connexion automatique
+    // Connexion WiFi directe au hotspot
     Serial.println("Connexion WiFi...");
-    Serial.println("Reseau AP: " + apName);
+    Serial.print("SSID: ");
+    Serial.println(WIFI_SSID);
 
-    if (wifiManager.autoConnect(apName.c_str(), "meteo123")) {
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 30) {
+        delay(1000);
+        Serial.print(".");
+        attempts++;
+    }
+    Serial.println();
+
+    if (WiFi.status() == WL_CONNECTED) {
         Serial.println("WiFi connecte!");
         Serial.print("IP: ");
         Serial.println(WiFi.localIP());
-
-        // Recuperer les valeurs entrees
-        strcpy(capteurNumero, custom_capteur_num.getValue());
-        strcpy(serverURL_base, custom_server_url.getValue());
-
-        // Sauvegarder et reconstruire
-        saveConfig();
-        capteurID = "ATOM_00" + String(capteurNumero);
-        serverURL = String(serverURL_base) + "/request/";
-
         setLED(false);  // LED off = pret
     } else {
         Serial.println("Echec connexion WiFi");

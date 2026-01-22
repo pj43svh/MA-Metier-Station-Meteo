@@ -24,6 +24,10 @@
 #define CAPTEUR_ID "ATOM_002"           // Identifiant du capteur
 #define SEND_INTERVAL 20000              // Intervalle d'envoi (20 sec)
 
+// WiFi - Ton hotspot
+const char* WIFI_SSID = "Bomboclat";
+const char* WIFI_PASSWORD = "zyxouzyxou";
+
 // URL du serveur Railway (cloud)
 String SERVER_URL = "https://nurturing-achievement-production.up.railway.app/request/";
 
@@ -77,20 +81,23 @@ void setup() {
         while(1) delay(1000);
     }
 
-    // Configuration WiFiManager
-    wifiManager.setConfigPortalTimeout(180);  // 3 minutes timeout
-    wifiManager.setAPCallback([](WiFiManager *myWiFiManager) {
-        Serial.println("Mode configuration WiFi active!");
-        Serial.println("Connectez-vous au reseau: METEO_CAPTEUR_2");
-        Serial.println("Puis allez sur: 192.168.4.1");
-        setLED(0, 0, 255);  // LED bleue = mode config
-    });
-
-    // Tentative de connexion automatique
+    // Connexion WiFi directe au hotspot
     Serial.println("Connexion WiFi...");
+    Serial.print("SSID: ");
+    Serial.println(WIFI_SSID);
     setLED(255, 255, 0);  // LED jaune = connexion
 
-    if (wifiManager.autoConnect("METEO_CAPTEUR_2", "meteo123")) {
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 30) {
+        delay(1000);
+        Serial.print(".");
+        attempts++;
+    }
+    Serial.println();
+
+    if (WiFi.status() == WL_CONNECTED) {
         Serial.println("WiFi connecte!");
         Serial.print("IP: ");
         Serial.println(WiFi.localIP());
