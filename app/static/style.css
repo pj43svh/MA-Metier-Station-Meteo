@@ -577,3 +577,62 @@ input[type=button].jello{
     padding: 40px;
     color: #f44336;
 }
+
+
+.summary-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.summary-box {
+    border: 2px solid #333;
+    border-radius: 15px;
+    padding: 20px;
+    width: 250px;
+    background-color: #505050;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-family: Arial, sans-serif;
+}
+
+.summary-box h3 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 16px;
+}
+
+.summary-box .row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.summary-box .row span:first-child {
+    font-weight: bold;
+    width: 80px;
+}
+
+.summary-box .row span:nth-child(2),
+.summary-box .row span:nth-child(3) {
+    width: 80px;
+    text-align: center;
+}
+.date-center {
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.date-center span {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background-color: #696969;
+
+}
+
+
