@@ -23,7 +23,8 @@ nav .logo {
 nav {
     margin-right: 10px;
     padding: 10px;
-    width: 15vw;
+    min-width: 13vw;
+    max-width: 13vw;
     background-color: #272727;
     flex-direction: row;
     min-height: calc(100vh - 20px);
@@ -71,7 +72,7 @@ nav footer{
     color: white;
     text-align: left;
     margin-left: 10px;
-    width: 15vw;
+    width: 13vw;
     margin-bottom: 10px;
 }
 .content {
@@ -129,6 +130,7 @@ canvas {
         align-content: center;
         height: auto;
         min-height: auto;
+        min-width: 100%;
     }
 
     nav .logo {
@@ -142,6 +144,7 @@ canvas {
     }
     nav footer{
         position: relative;
+        max-width: 100%;
         width: 100%;
     }
     canvas{
