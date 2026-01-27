@@ -1,0 +1,7 @@
+/__pycache__
+/.venv
+static/*.png
+weather_data.db
+.claude/
+generate_pdf.py
+nul

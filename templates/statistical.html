@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="10"> <!-- Rafraîchit toutes les 10s -->
+    <title>Weather station - Statistical</title>
+    <link rel="icon" type="image/x-icon" href="/static/icone.png">
+</head>
+
+<body onload="">
+    <!--side bar-->
+    <nav>
+        <img src="static\icone.png" alt="icone" id="logo" class="logo">
+        <div class="link">
+            <hr>
+            <a href="/"><h2>Home</h2></a>
+            <hr>
+            <ul>
+                <li><a href="/">datas</a></li>
+                <li><a href="about">about</a></li>
+                <li><a href="statistical">Statistical</a></li>
+                <li><a href="history">history</a></li>
+            </ul>
+            <hr>
+            <ul>
+                <li><a href="https://github.com/pj43svh/MA-Metier-Station-Meteo">Github</a></li>
+                <li><a href="https://cpnv.ch">Cpnv</a></li>
+                <li><a href="https://trello.com/b/mbKZJSjJ/station-m%C3%A9t%C3%A9o-esp32-rpi">Trello</a></li>
+            </ul>
+            <hr>
+        </div>
+    </nav>
+    <div>
+        <h1>STATISTICAL</h1>
+        
+            <select name="date" id="date">
+                <option value="today" selected>Today</option>
+            </select>
+            <input type="button" value="Refresh" id="refresh_btn">
+
+        <div class="content">
+            <div class="sensors">
+
+                <h1>Sensor</h1>
+
+                <div class="card" id="graphique_pluie">
+                    <img src="/static/graph_Temperatures.png" alt="Graphique Temperature"
+                        style="max-width: 100%; height: auto;" class="graphique">
+                </div>
+                
+
+                <div class="card" id="graphique_pression">
+                    <img src="/static/graph_Pressures.png" alt="Graphique Pressure"
+                        style="max-width: 100%; height: auto;" class="graphique">
+                </div>
+
+                <div class="card" id="graphique_humidite">
+                    <img src="/static/graph_Humidity levels.png" alt="Graphique Humidité"
+                        style="max-width: 100%; height: auto;" class="graphique">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+<script src="/static/js/statistical.js"></script>
+</body>
+
+</html>

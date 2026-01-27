@@ -13,6 +13,8 @@ dans le tableau ci dessous, veuillez mettre un emoji ❌ les périodes où vous 
 |6 midi|
 |7|❌|❌|✅|✅|✅|
 |- pause|
-|8|❌|❌|✅|✅|✅|
-|9|❌|❌|✅|✅|❌|
-|10|❌|❌|❌|✅|❌|
+|8|✅|❌|✅|✅|✅|
+|9|✅|❌|✅|✅|✅|
+|10|✅|❌|✅|✅|✅|
+
+Rangements :

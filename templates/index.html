@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather station - Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/static/icone.png">
+</head>
+
+<body>
+    <!--side bar-->
+    <nav>
+        <img src="static\icone.png" alt="icone" id="logo" class="logo">
+        <div class="link">
+            <hr>
+            <a href="/"><h2>Home</h2></a>
+            <hr>
+            <ul>
+                <li><a href="/">Datas</a></li>
+                <li><a href="about">about</a></li>
+                <li><a href="statistical">statistical</a></li>
+                <li><a href="history">history</a></li>
+                <li><a href="admin">Admin ESP32</a></li>
+            </ul>
+            <hr>
+            <ul>
+                <li><a href="https://github.com/pj43svh/MA-Metier-Station-Meteo">Github</a></li>
+                <li><a href="https://cpnv.ch">Cpnv</a></li>
+                <li><a href="https://trello.com/b/mbKZJSjJ/station-m%C3%A9t%C3%A9o-esp32-rpi">Trello</a></li>
+            </ul>
+            <hr>
+        </div>
+    </nav>
+    <div>
+        <h1>DASHBOARD</h1>
+
+        <!-- Les capteurs sont generes dynamiquement par JavaScript -->
+        <div class="content">
+            <div class="loading">
+                <p>Chargement des capteurs...</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="/static/js/data.js"></script>
+
+</body>
+
+</html>
