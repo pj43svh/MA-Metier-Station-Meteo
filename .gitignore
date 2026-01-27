@@ -2,6 +2,8 @@ __pycache__
 /.venv
 /app/static/*.png
 weather_data.db
+api_BACKUP.py
+
 .claude/
 generate_pdf.py
 nul
