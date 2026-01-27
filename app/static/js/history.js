@@ -6,30 +6,51 @@ async function loadHistory(sensorId, dateFilter = "today") {
         const url = `/api/history${sensorId}?date=${dateFilter}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Erreur du serveur');
-
+        
         const data = await response.json();
-
+        
         const { date, hour, temperature, humidity, pressure } = data;
         if (!date || !hour || !temperature || !humidity || !pressure) {
             throw new Error('Données incomplètes reçues');
         }
-
+        
         const maxLength = Math.max(date.length, hour.length, temperature.length, humidity.length, pressure.length);
         const tbody = document.getElementById(`history${sensorId}-body`);
         tbody.innerHTML = '';
-
+        
+        
+        
         for (let i = maxLength - 1; i >= 0; i--) {
             const row = document.createElement('tr');
+            
+            const tVal = temperature[i];
+            
             row.innerHTML = `
-                <td>${date[i] !== undefined ? date[i] : '—'}</td>
-                <td>${hour[i] !== undefined ? hour[i] : '—'}</td>
-                <td>${temperature[i] !== undefined ? temperature[i] + ' °C' : '—'}</td>
-                <td>${humidity[i] !== undefined ? humidity[i] + ' %' : '—'}</td>
-                <td>${pressure[i] !== undefined ? pressure[i] + ' hPa' : '—'}</td>
-            `;
+        <td>${date[i] !== undefined ? date[i] : '—'}</td>
+        <td>${hour[i] !== undefined ? hour[i] : '—'}</td>
+        <td class="temp-cell">
+            ${tVal !== undefined ? tVal + ' °C' : '—'}
+        </td>
+        <td>${humidity[i] !== undefined ? humidity[i] + ' %' : '—'}</td>
+        <td>${pressure[i] !== undefined ? pressure[i] + ' hPa' : '—'}</td>
+    `;
+            
+            const tempCell = row.querySelector('.temp-cell');
+            if (tVal !== undefined && tVal !== null && !isNaN(tVal)) {
+                const tempNum = Number(tVal);
+                if (tempNum >= 22) {
+                    tempCell.style.color = 'red';
+                    tempCell.style.fontWeight = 'bold';
+                } else {
+                    tempCell.style.color = '';
+                    tempCell.style.fontWeight = '';
+                }
+            }
+            
             tbody.appendChild(row);
         }
-
+        
+        
     } catch (error) {
         console.error('Erreur lors du chargement de l’historique :', error);
         document.getElementById(`history${sensorId}-body`).innerHTML = `<tr><td colspan="5">Erreur : ${error.message}</td></tr>`;
@@ -42,12 +63,12 @@ async function loadDates() {
     try {
         const response = await fetch('/api/dates_unique');
         if (!response.ok) throw new Error('Erreur du serveur');
-
+        
         const dates = await response.json();
-
+        
         const selectList = document.getElementById("date");
-
-
+        
+        
         // Ajouter les dates uniques
         for (const date of dates) {
             const option = document.createElement('option');
@@ -55,8 +76,8 @@ async function loadDates() {
             option.textContent = date;
             selectList.appendChild(option);
         }
-
-
+        
+        
     } catch (error) {
         console.error('Erreur lors du chargement des dates :', error);
         const selectList = document.getElementById("date");
