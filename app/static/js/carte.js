@@ -1,3 +1,5 @@
+console.log("carte.js chargé");
+
 // Fonction pour récupérer les données résumées d'un capteur
 function fetchSummary(sensorId) {
     fetch(`/daily_summary?sensor_id=${sensorId}&limit=999`)

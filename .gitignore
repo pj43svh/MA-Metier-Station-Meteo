@@ -2,3 +2,4 @@ __pycache__
 /.venv
 static/*.png
 weather_data.db
+api_BACKUP.py
