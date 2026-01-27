@@ -32,10 +32,23 @@ def get_sensors_status():
 
     now = datetime.now()
 
+    # Recuperer les noms personnalises depuis esp32_devices
+    esp32_devices = db.get_all_esp32_devices()
+    sensor_names = {}
+    for device in esp32_devices:
+        if device["sensor_number"]:
+            sensor_names[str(device["sensor_number"])] = device["name"]
+
     for sensor in sensors_status:
+        sensor_num = sensor["name"].replace("esp", "")
+        # Utiliser le nom personnalise s'il existe, sinon "Sensor X"
+        custom_name = sensor_names.get(sensor_num)
+        display_name = custom_name if custom_name else f"Sensor {sensor_num}"
+
         sensor_info = {
             "id": sensor["name"],
-            "number": sensor["name"].replace("esp", ""),
+            "number": sensor_num,
+            "name": display_name,
             "last_date": None,
             "last_hour": None,
             "status": "offline",

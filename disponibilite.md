@@ -16,3 +16,4 @@ dans le tableau ci dessous, veuillez mettre un emoji ❌ les périodes où vous 
 |8|✅|❌|✅|✅|✅|
 |9|✅|❌|✅|✅|✅|
 |10|✅|❌|✅|✅|✅|
+

@@ -11,14 +11,17 @@ const sensorsContainer = document.querySelector('.content');
 /**
  * Cree le HTML pour un capteur avec indicateur de statut
  */
-function createSensorCard(sensorNum, status = 'offline', statusText = 'Inconnu') {
+function createSensorCard(sensorNum, status = 'offline', statusText = 'Inconnu', name = null) {
     const card = document.createElement('div');
     card.className = 'sensors';
     card.id = `sensor${sensorNum}`;
 
+    // Utiliser le nom personnalise s'il existe, sinon "Sensor X"
+    const displayName = name || `Sensor ${sensorNum}`;
+
     card.innerHTML = `
         <div class="sensor-header">
-            <h1>Sensor ${sensorNum}</h1>
+            <h1>${displayName}</h1>
             <div class="sensor-status">
                 <span class="status-dot ${status}" id="status-dot-${sensorNum}"></span>
                 <span class="status-text" id="status-text-${sensorNum}">${statusText}</span>
@@ -59,7 +62,7 @@ async function loadSensors() {
         if (data.sensors && data.sensors.length > 0) {
             // Creer une carte pour chaque capteur avec son statut
             data.sensors.forEach(sensor => {
-                const card = createSensorCard(sensor.number, sensor.status, sensor.status_text);
+                const card = createSensorCard(sensor.number, sensor.status, sensor.status_text, sensor.name);
                 sensorsContainer.appendChild(card);
             });
         } else {
