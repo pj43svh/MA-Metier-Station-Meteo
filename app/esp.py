@@ -1,3 +1,8 @@
+# Auteur : Théo Läderach
+# Dernière modification : 21.01.2025
+# Modifications : correction de la gestion des erreurs
+# Fonction : recevoir les requêtes POST des ESP32 et ajouter les données à la base de données
+
 from database import add_data, create_table_if_not_exists, get_all_sensors, register_esp32
 from flask import request, Blueprint, jsonify
 from werkzeug.exceptions import InternalServerError

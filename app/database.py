@@ -1,3 +1,8 @@
+# Auteur : Théo Läderach
+# Dernière modification : 21.01.2025
+# Modifications : ajout d'une description au fonctions
+# Fonction : créer la DB SQLite et gérer les opérations de base de données
+
 import sqlite3
 import os
 

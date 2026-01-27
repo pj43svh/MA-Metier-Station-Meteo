@@ -393,6 +393,7 @@ def refresh_statistical():
     return "refresh",200
 
 
+
 ###############################################################################
 ####################___API ADMIN - GESTION DES ESP32___########################
 ###############################################################################
@@ -534,3 +535,99 @@ def delete_esp32():
         return jsonify({"status": "success", "message": "ESP32 supprime"})
     else:
         return jsonify({"error": "ESP32 non trouve"}), 404
+
+
+#api/daily_summary?data=12.3.1
+@api.route("/daily_summary", methods=["GET"])
+def daily_summary():
+    # /api/daily_summary?sensor_id=1&limit=7
+    sensor_id = request.args.get("sensor_id", type=int)
+    limit = request.args.get("limit", default=7, type=int)
+
+    if sensor_id not in (1, 2):
+        return jsonify([]), 400
+
+    data = summary(sensor_id, limit)
+
+    if not data:
+        return jsonify([])
+    return jsonify(data)
+
+
+def summary(sensor_id, limit=7):
+    """
+    Calcule les max/min par jour pour un capteur donné.
+    Si db.read_data ne supporte pas group_by, on fait le regroupement en Python.
+    """
+    device_name = f"esp{sensor_id}"
+
+    # Récupérer TOUTES les données (ou les N dernières)
+    try:
+        # Récupérer les données avec date, temperature, humidity, pressure
+        results = db.read_data(
+            device_name,
+            column="date, temperature, humidity, pressure",
+            order="date DESC",  # Du plus récent au plus ancien
+            limit=limit    # Récupérer jusqu'à 24h par jour (sécurité)
+        )
+    except Exception as e:
+        print(f"Erreur dans summary({sensor_id}): {e}")
+        return []
+
+    # Si pas de données
+    if not results:
+        return []
+
+    # Regrouper par date en Python
+    from collections import defaultdict
+    grouped = defaultdict(lambda: {
+        "temperature": [],
+        "humidity": [],
+        "pressure": []
+    })
+
+    for row in results:
+        date = row[0]
+        temp = row[1]
+        hum = row[2]
+        press = row[3]
+
+        if temp is not None:
+            grouped[date]["temperature"].append(temp)
+        if hum is not None:
+            grouped[date]["humidity"].append(hum)
+        if press is not None:
+            grouped[date]["pressure"].append(press)
+
+    # Créer la liste des jours (max/min)
+    formatted = []
+    for date in grouped:
+        t_list = grouped[date]["temperature"]
+        h_list = grouped[date]["humidity"]
+        p_list = grouped[date]["pressure"]
+
+        formatted.append({
+            "date": date,
+            "temperature": {
+                "max": max(t_list) if t_list else None,
+                "min": min(t_list) if t_list else None
+            },
+            "humidity": {
+                "max": max(h_list) if h_list else None,
+                "min": min(h_list) if h_list else None
+            },
+            "pressure": {
+                "max": max(p_list) if p_list else None,
+                "min": min(p_list) if p_list else None
+            }
+        })
+
+    # Trier par date décroissante (du plus récent au plus ancien)
+    formatted.sort(key=lambda x: x["date"], reverse=True)
+
+    # Limiter au nombre de jours demandé
+    return formatted[:limit]
+
+
+
+

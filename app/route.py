@@ -25,7 +25,6 @@ def history():
     return render_template("history.html")
 
 
-
 @route.route("/statistical")
 def statistical():
 

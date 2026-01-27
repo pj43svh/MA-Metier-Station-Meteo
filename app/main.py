@@ -1,4 +1,7 @@
-
+# Auteur : Théo Läderach
+# Dernière modification : 21.01.2025
+# Modifications : ajout des commentraires
+# Fonction : Lance l'application Flask et enregistre les blueprints
 import os
 from flask import Flask, render_template
 
