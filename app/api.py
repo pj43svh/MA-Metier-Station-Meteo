@@ -216,7 +216,8 @@ def api_data(type_str):
         return str(value) if value is not None else "NULL"
     else:
         return "Aucune donnée"
-    
+
+
 def api_datas_list(type_str, limit=100,date_filter="today"):
     """Retourne une liste des dernières valeurs pour une colonne"""
     if type_str == "hour":
@@ -543,18 +544,19 @@ def daily_summary():
     # /api/daily_summary?sensor_id=1&limit=7
     sensor_id = request.args.get("sensor_id", type=int)
     limit = request.args.get("limit", default=7, type=int)
+    date = request.args.get("date", default="today", type=str)
 
     if sensor_id not in (1, 2):
         return jsonify([]), 400
 
-    data = summary(sensor_id, limit)
+    data = summary(sensor_id, limit,date_filter=date)
 
     if not data:
         return jsonify([])
     return jsonify(data)
 
 
-def summary(sensor_id, limit=7):
+def summary(sensor_id, limit=7,date_filter="today"):
     """
     Calcule les max/min par jour pour un capteur donné.
     Si db.read_data ne supporte pas group_by, on fait le regroupement en Python.
@@ -564,12 +566,21 @@ def summary(sensor_id, limit=7):
     # Récupérer TOUTES les données (ou les N dernières)
     try:
         # Récupérer les données avec date, temperature, humidity, pressure
-        results = db.read_data(
+        if date_filter != "today":
+            results = db.read_data(
             device_name,
             column="date, temperature, humidity, pressure",
-            order="date DESC",  # Du plus récent au plus ancien
-            limit=limit    # Récupérer jusqu'à 24h par jour (sécurité)
+            where=f"date = '{date_filter}'",
+            order="id DESC",  # Du plus récent au plus ancien Par id
+            limit=limit       # Récupérer jusqu'à 24h par jour (sécurité)
         )
+        else:
+            results = db.read_data(
+                device_name,
+                column="date, temperature, humidity, pressure",
+                order="id DESC",  # Du plus récent au plus ancien Par id
+                limit=limit    # Récupérer jusqu'à 24h par jour (sécurité)
+            )
     except Exception as e:
         print(f"Erreur dans summary({sensor_id}): {e}")
         return []

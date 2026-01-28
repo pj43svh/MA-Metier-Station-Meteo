@@ -91,6 +91,8 @@ async function refresh_date() {
     date_selected = document.getElementById("date").value;
     loadHistory("1",date_selected = date_selected);
     loadHistory("2",date_selected = date_selected);
+    fetchSummary("1",dateFilter = date_selected);
+    fetchSummary("2",dateFilter = date_selected);
 }
 
 // Attacher l'événement au bouton, si présent
@@ -99,7 +101,7 @@ if (refreshBtn) {
     refreshBtn.addEventListener("click", refresh_date);
 }
 document.addEventListener('DOMContentLoaded', () => {
-    loadDates(); // 👈 Charger les dates au chargement
+    loadDates(); // Charger les dates au chargement
     refresh_date();
 });
 

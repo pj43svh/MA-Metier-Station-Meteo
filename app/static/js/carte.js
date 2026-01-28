@@ -1,8 +1,9 @@
 console.log("carte.js chargé");
 
+
 // Fonction pour récupérer les données résumées d'un capteur
-function fetchSummary(sensorId) {
-    fetch(`/daily_summary?sensor_id=${sensorId}&limit=999`)
+function fetchSummary(sensorId, dateFilter = "today") {
+    fetch(`/daily_summary?sensor_id=${sensorId}&limit=999&date=${dateFilter}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Erreur réseau pour capteur ${sensorId}`);
@@ -34,6 +35,18 @@ function fetchSummary(sensorId) {
 
 // Appeler les deux capteurs au chargement de la page
 document.addEventListener('DOMContentLoaded', () => {
-    fetchSummary(1);
-    fetchSummary(2);
+    try{
+        fetchSummary("1",dateFilter = date_selected);
+        fetchSummary("2",dateFilter = date_selected);
+    } catch {
+        let date_selected = "today";
+        globalThis.date_selected=date_selected;
+        fetchSummary("1",dateFilter = "today");
+        fetchSummary("2",dateFilter = "today");
+    }
+        
 });
+
+
+setInterval(() => fetchSummary("1",date_selected = date_selected), 20000);
+setInterval(() => fetchSummary("2",date_selected = date_selected), 20000);
