@@ -3,13 +3,35 @@ html {
 }
 
 body {
-    background-color: #313131;
-    color: #ffffff;
-    font-family: Arial, Helvetica, sans-serif;
-    display: flex;
-    margin: 0%;
     min-height: 100vh;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: linear-gradient(
+        180deg,
+        #0a4d8c 0%,    /* bleu foncé haut */
+        #2f78b7 35%,   /* bleu moyen */
+        #6fa6d8 65%,   /* bleu clair */
+        #a9c9e8 100%   /* bleu très clair bas */
+    );
+
+    color: #ffffff;
+    display: flex;
 }
+
+
+body{
+  display: flex;
+}
+
+/* colonne de droite */
+.main{
+  flex: 1;                 /* prend toute la place restante */
+  padding: 20px 30px;      /* espace propre autour */
+  box-sizing: border-box;
+  min-width: 0;            /* évite débordements */
+}
+
 
 nav .logo {
     background-color: white;
@@ -578,7 +600,7 @@ input[type=button].jello{
     color: #f44336;
 }
 
-
+/*cartes*/
 .summary-container {
     display: flex;
     flex-wrap: wrap;
@@ -595,6 +617,9 @@ input[type=button].jello{
     background-color: #505050;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     font-family: Arial, sans-serif;
+    margin: 0;
+    opacity: 90%;
+    
 }
 
 .summary-box h3 {
@@ -604,22 +629,33 @@ input[type=button].jello{
 }
 
 .summary-box .row {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-    font-size: 14px;
+  display: flex ;
+  flex-direction: column ;
+  align-items: center;
+  margin: 18px 0 ;
 }
 
 .summary-box .row span:first-child {
-    font-weight: bold;
-    width: 80px;
+  font-weight: bold ;
+  font-size: 15px ;
+  margin-bottom: 6px ;
 }
+
+.summary-box .row:not(:last-child) {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.6) ; /**/
+  padding-bottom: 12px ;
+}
+
 
 .summary-box .row span:nth-child(2),
 .summary-box .row span:nth-child(3) {
-    width: 80px;
-    text-align: center;
+  font-size: 13px ;
+  color: #ffffff ;
+  margin: 2px 0 ;
+  width: auto ;     
+  text-align: center ;
 }
+
 .date-center {
     text-align: center;
     margin-bottom: 15px;
@@ -631,8 +667,72 @@ input[type=button].jello{
     display: inline-block;
     padding: 5px 10px;
     border-radius: 8px;
-    background-color: #696969;
+    background: rgba(255, 255, 255, 0.08);      /* transparent */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);        
+    
 
 }
 
+/* Effet verre (glass) pour les cartes */
+.data,
+.card,
+.sensors,
+.summary-box,
+.history-card {
+    background: rgba(255, 255, 255, 0.08);      /* transparent */
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);        
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.data p,
+.card-content {
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.data,
+.card,
+.sensors,
+.summary-box,
+.history-card {
+    border-radius: 18px;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.data:hover,
+.card:hover,
+.sensors:hover,
+.summary-box:hover,
+.history-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+}
+ /*menu*/
+nav a,
+nav h2,
+nav li a {
+    color: #ffffff;
+}
+
+nav li a:hover {
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+nav {
+    background: rgba(255, 255, 255, 0.08) ;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    border-radius: 0 18px 18px 0;
+}
+
+nav .logo {
+    background: rgb(238, 234, 234);
+    backdrop-filter: blur(8px);
+}
 
