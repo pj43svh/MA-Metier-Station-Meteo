@@ -1,6 +1,6 @@
 from flask import jsonify,Blueprint,request
-import app.database as db
-from app.statistical import create_graph_bar,create_graph_line
+import database as db
+from statistical import create_graph_bar,create_graph_line
 
 api = Blueprint("api",__name__)
 
@@ -380,18 +380,31 @@ def get_history2():
         "pressure": press_list
     })
 
-@api.route("/statistical_refresh", methods=["GET"])
+@api.route("/statistical", methods=["GET"])
 def refresh_statistical():
     try :
         selected_date = request.args.get("date",type=str)
     except:
         selected_date = "today"
-
-# génèration des graphiques quand la page est appelée
-    create_graph_line(["temperature1","temperature2"],"hour",label_x="Hours",label_y="°C",line_title=["Sensor 1","Sensor 2"],title="Temperatures", color =["tab:blue","tab:red"],date=selected_date)
-    create_graph_line(["pressure1","pressure2"],"hour",label_x="Hours",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"],date=selected_date)
-    create_graph_bar(["humidity1","humidity2"],"hour",label_x="Hours",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"],date=selected_date)
-    return "refresh",200
+    data_type = request.args.get("type", default="None", type=str)
+    if data_type :
+        data1 = api_datas_list(f"{data_type}1", limit=50, date_filter=selected_date)
+        data2 = api_datas_list(f"{data_type}2", limit=50, date_filter=selected_date)
+        hours = api_datas_list("hour", limit=50, date_filter=selected_date)
+    else :
+        return jsonify(data_final = {
+        "data1": [],
+        "data2": [],
+        "hours": []
+    }),400
+    
+    data_final = {
+        "data1": data1,
+        "data2": data2,
+        "hours": hours
+    }
+    
+    return jsonify(data_final),200
 
 
 
