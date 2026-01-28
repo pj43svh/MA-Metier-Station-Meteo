@@ -8,7 +8,11 @@ from flask import request, Blueprint, jsonify
 from werkzeug.exceptions import InternalServerError
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import re
+
+# Fuseau horaire Suisse (Berne)
+TIMEZONE_SUISSE = ZoneInfo("Europe/Zurich")
 
 
 esp = Blueprint("esp",__name__)
@@ -31,8 +35,10 @@ def esp_request():
     pressure = data.get('pression')
     mac_address = data.get('mac_address')  # Optionnel
 
-    date_now = datetime.now().strftime("%Y-%m-%d")
-    hour_now = datetime.now().strftime("%H:%M:%S")
+    # Utiliser l'heure suisse (Berne)
+    now_suisse = datetime.now(TIMEZONE_SUISSE)
+    date_now = now_suisse.strftime("%Y-%m-%d")
+    hour_now = now_suisse.strftime("%H:%M:%S")
 
     # Extraire le numero du capteur (ATOM_001 -> 1, ATOM_002 -> 2, etc.)
     match = re.search(r'ATOM_0*(\d+)', capteur_id)

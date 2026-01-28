@@ -26,11 +26,12 @@ def get_sensors_status():
     Un capteur est considere "online" s'il a envoye des donnees dans les 2 dernieres minutes.
     """
     from datetime import datetime, timedelta
+    from zoneinfo import ZoneInfo
 
     sensors_status = db.get_all_sensors_status()
     result = []
 
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Zurich"))
 
     # Recuperer les noms personnalises depuis esp32_devices
     esp32_devices = db.get_all_esp32_devices()
@@ -472,9 +473,10 @@ def list_esp32_devices():
     Pour l'interface admin.
     """
     from datetime import datetime
+    from zoneinfo import ZoneInfo
 
     devices = db.get_all_esp32_devices()
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Zurich"))
 
     for device in devices:
         # Calculer le statut en ligne/hors ligne

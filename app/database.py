@@ -176,7 +176,8 @@ def register_esp32(mac_address, ip_address=None):
     Retourne le numero de capteur assigne (ou None si pas encore configure).
     """
     from datetime import datetime
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    from zoneinfo import ZoneInfo
+    now = datetime.now(ZoneInfo("Europe/Zurich")).strftime("%Y-%m-%d %H:%M:%S")
 
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -285,13 +286,30 @@ def get_all_esp32_devices():
 def delete_esp32_device(mac_address):
     """
     Supprime un ESP32 de la base de donnees.
+    Supprime aussi la table de donnees du capteur (espX).
     """
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Recuperer le numero du capteur avant suppression
+    cursor.execute("SELECT sensor_number FROM esp32_devices WHERE mac_address = ?", (mac_address,))
+    result = cursor.fetchone()
+    sensor_number = result[0] if result else None
+
+    # Supprimer l'entree de esp32_devices
     cursor.execute("DELETE FROM esp32_devices WHERE mac_address = ?", (mac_address,))
-    conn.commit()
     rows_affected = cursor.rowcount
+
+    # Supprimer aussi la table de donnees si elle existe
+    if sensor_number:
+        table_name = f"esp{sensor_number}"
+        try:
+            cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+            print(f"Table {table_name} supprimee")
+        except Exception as e:
+            print(f"Erreur suppression table {table_name}: {e}")
+
+    conn.commit()
     conn.close()
 
     return rows_affected > 0
