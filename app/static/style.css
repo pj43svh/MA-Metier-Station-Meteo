@@ -11,8 +11,8 @@ body {
         180deg,
         #0a4d8c 0%,    /* bleu foncé haut */
         #2f78b7 35%,   /* bleu moyen */
-        #6fa6d8 65%,   /* bleu clair */
-        #a9c9e8 100%   /* bleu très clair bas */
+        #6ba2d6 65%,   /* bleu clair */
+        #9bc0e6 100%   /* bleu très clair bas */
     );
 
     color: #ffffff;
@@ -198,26 +198,26 @@ canvas {
 .history-table th,
 .history-table td {
     padding: 10px 12px;
-    border-bottom: 1px solid #424242;
+    border-bottom: 1px solid #6ca5da;
     text-align: center;
 }
 
 thead{
-    border-bottom: 3px solid #313131;
+    border-bottom: 3px solid #032341;
 }
 
 .history-table th {
-    background: #696969;
+    background: #2975bd;
     font-weight: bold;
 }
 
 .history-table tbody tr:hover {
-    background: #505050;
+    background: #4a93d6;
     animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
 }
 .history-table tbody tr{
     animation: scale-down-center 0.4s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-    background: #7a7a7a;
+    background: #65a6e2;
 }
 
 .card {
@@ -240,7 +240,7 @@ thead{
 }
 
 .graphique{
-    border-radius: 10px;
+    border-radius: 10px;    
 }
 .sensors{
     background-color: #505050;
@@ -250,21 +250,21 @@ thead{
 }
 
 select, input[type=button]{
-    background-color: #424242;
+    background-color: #09457e;
     color: #cfcfcf;
-    border: #505050 2px solid;
+    border: #68a1d6 2px solid;
     border-radius: 5px;
         animation: scale-down-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
 
 }
 
 select:hover, input[type=button]:hover{
-    background-color: #505050;
+    background-color: #0c5599;
     animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
 
 }
 input[type=button].jello{
-    background-color: #313131;
+    background-color: #0e5292;
 	animation: jello-horizontal 0.9s both;
 
 }
@@ -329,7 +329,7 @@ input[type=button].jello{
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: #424242;
+    background-color: #0a4d8c;
     padding: 5px 12px;
     border-radius: 20px;
 }
@@ -420,7 +420,7 @@ input[type=button].jello{
 }
 
 .admin-section {
-    background-color: #424242;
+    background-color: #0b5294;
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -438,7 +438,7 @@ input[type=button].jello{
 }
 
 .btn-refresh {
-    background-color: #505050;
+    background-color: #1562aa;
     color: #fff;
     border: none;
     padding: 8px 16px;
@@ -447,7 +447,7 @@ input[type=button].jello{
 }
 
 .btn-refresh:hover {
-    background-color: #666;
+    background-color: #256eb3;
 }
 
 .devices-grid {
@@ -457,10 +457,10 @@ input[type=button].jello{
 }
 
 .device-card {
-    background-color: #505050;
+    background-color: #1562aa;
     padding: 15px;
     border-radius: 10px;
-    border-left: 4px solid #666;
+    border-left: 4px solid #1f6bb3;
 }
 
 .device-card.configured {
@@ -522,18 +522,18 @@ input[type=button].jello{
 .sensor-select {
     flex: 1;
     padding: 8px;
-    background-color: #424242;
+    background-color: #1562aa;
     color: #fff;
-    border: 1px solid #666;
+    border: 1px solid #1f6bb3;
     border-radius: 5px;
 }
 
 .name-input {
     flex: 1;
     padding: 8px;
-    background-color: #424242;
+    background-color: #1562aa;
     color: #fff;
-    border: 1px solid #666;
+    border: 1px solid #1f6bb3;
     border-radius: 5px;
 }
 
@@ -553,7 +553,7 @@ input[type=button].jello{
 }
 
 .device-actions {
-    border-top: 1px solid #666;
+    border-top: 1px solid #1f6bb3;
     padding-top: 10px;
 }
 
@@ -575,7 +575,7 @@ input[type=button].jello{
 .no-devices {
     text-align: center;
     padding: 40px;
-    background-color: #505050;
+    background-color: #1562aa;
     border-radius: 10px;
     grid-column: 1 / -1;
 }
@@ -586,7 +586,7 @@ input[type=button].jello{
 }
 
 .instructions {
-    background-color: #3a3a3a;
+    background-color: #036dcf;
 }
 
 .instructions ol {
@@ -684,7 +684,7 @@ input[type=button].jello{
 .sensors,
 .summary-box,
 .history-card {
-    background: rgba(255, 255, 255, 0.08);      /* transparent */
+    background: rgba(255, 255, 255, 0.13);      /* transparent */
     border: 1px solid rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);        

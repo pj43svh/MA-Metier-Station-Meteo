@@ -108,3 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
 // Actualiser toutes les 20 secondes
 setInterval(() => loadHistory("1",date_selected = date_selected), 20000);
 setInterval(() => loadHistory("2",date_selected = date_selected), 20000);
+// petit script inutile pour rendre le bouton swag
+document.querySelectorAll('input[type=button]').forEach(button => {
+    button.addEventListener('click', function () {
+        this.classList.add('jello');
+        // Supprime la classe après la fin de l'animation pour permettre une nouvelle animation
+        this.addEventListener('animationend', function () {
+            this.classList.remove('jello');
+        }, { once: true });
+    });
+});
