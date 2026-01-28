@@ -39,6 +39,7 @@ def esp_request():
     now_suisse = datetime.now(TIMEZONE_SUISSE)
     date_now = now_suisse.strftime("%Y-%m-%d")
     hour_now = now_suisse.strftime("%H:%M:%S")
+    ts_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #timestamp
 
     # Extraire le numero du capteur (ATOM_001 -> 1, ATOM_002 -> 2, etc.)
     match = re.search(r'ATOM_0*(\d+)', capteur_id)
@@ -50,15 +51,18 @@ def esp_request():
         return jsonify({"error": "Format capteur_id invalide"}), 400
 
     # Creer la table si elle n'existe pas (nouveau capteur)
-    create_table_if_not_exists(table_name)
+    #création dorvée des tables esp1 et esp2
+    #Permet d'insérer des valeurs NULL même si l'autre capteur est déconnecté
+    create_table_if_not_exists("esp1")
+    create_table_if_not_exists("esp2")
 
     # Mettre a jour last_seen si mac_address fourni
     if mac_address:
         ip_address = request.remote_addr
         register_esp32(mac_address, ip_address)
 
-    # Ajouter les donnees
-    result = add_data(table_name, value={
+    # Ajouter les donnees du capteur actif
+    result_main = add_data(table_name, value={
         "temperature": temperature,
         "humidity": humidity,
         "pressure": pressure,
@@ -66,7 +70,29 @@ def esp_request():
         "hour": hour_now
     })
 
-    if result:
+    #Détermination de l'autre capteur (celui qui n'a rien envoyé)
+    if table_name == "esp1":
+        other_table = "esp2"
+    elif table_name == "esp2":
+        other_table = "esp1"
+    else:
+        other_table = None
+    
+    # Insertion d'une ligne avec valeurs NULL pour le capteur inactif
+    # Cela permet de garder une synchronisation temporelle entre les capteurs
+    result_other = True
+    if other_table:
+        result_other = add_data(other_table, value={
+            "temperature": None,
+            "humidity": None,
+            "pressure": None,
+            "date": date_now,
+            "hour": hour_now,
+            "ts": ts_now #
+        })
+
+    # Succès uniquement si les deux insertions ont réussi
+    if result_main and result_other:
         print(f"Donnees recues de {capteur_id} ({table_name}): T={temperature}C, H={humidity}%, P={pressure}hPa")
         return jsonify({"Serveur local": "Succès", "capteur": table_name}), 201
     else:
@@ -80,7 +106,5 @@ def list_sensors():
     """
     sensors = get_all_sensors()
     return jsonify({"sensors": sensors})
-
-    
 
 
