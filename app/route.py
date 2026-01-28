@@ -10,9 +10,14 @@ route = Blueprint("route",__name__)
 ####################___PARTIE API : DAILY SUMMARY___############################
 ###############################################################################
 
-import sqlite3
+import sqlite3 #pour lire la bd
 import os
 
+"""
+    Cette fonction retourne le chemin ABSOLU vers la base de données.
+    Le fichier route.py est dans le dossier /app,
+    donc on remonte d’un niveau pour atteindre la racine du projet.
+    """
 def get_db_path():
     # Remonte de app/ vers la racine du projet
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -37,7 +37,7 @@
             <li><a href="/admin">admin panel</a></li>
         </footer>
     </nav>
-    <div>
+    <div class="main">
         <h1>DASHBOARD</h1>
 
         <!-- Les capteurs sont generes dynamiquement par JavaScript -->
@@ -47,27 +47,28 @@
             </div>
         </div>
 
-        <div id="summary-container" class="summary-container">
-            <div class="summary-box" id="summary1">
-                <div class="date-center">
-                    <span>Date: <span id="date1">-</span></span>
-                </div>
-                <div class="row">
-                    <span>Température</span>
-                    <span>Max: <span id="temp-max1">-</span>°C</span>
-                    <span>Min: <span id="temp-min1">-</span>°C</span>
-                </div>
-                <div class="row">
-                    <span>Humidité</span>
-                    <span>Max: <span id="hum-max1">-</span>%</span>
-                    <span>Min: <span id="hum-min1">-</span>%</span>
-                </div>
-                <div class="row">
-                    <span>Pression</span>
-                    <span>Max: <span id="press-max1">-</span>hPa</span>
-                    <span>Min: <span id="press-min1">-</span>hPa</span>
-                </div>
-            </div>
+<div id="summary-container" class="summary-container">
+
+    <div class="summary-box" id="summary1">
+        <div class="date-center">
+            <span>Date: <span id="date1">-</span></span>
+        </div>
+        <div class="row">
+            <span>Température</span>
+            <span>Max: <span id="temp-max1">-</span>°C</span>
+            <span>Min: <span id="temp-min1">-</span>°C</span>
+        </div>
+        <div class="row">
+            <span>Humidité</span>
+            <span>Max: <span id="hum-max1">-</span>%</span>
+            <span>Min: <span id="hum-min1">-</span>%</span>
+        </div>
+        <div class="row">
+            <span>Pression</span>
+            <span>Max: <span id="press-max1">-</span>hPa</span>
+            <span>Min: <span id="press-min1">-</span>hPa</span>
+        </div>
+    </div>
 
             <div class="summary-box" id="summary2">
                 <div class="date-center">
@@ -95,8 +96,9 @@
     </div>
     </div>
 
-    <script src="/static/js/data.js"></script>
-    <script src="/static/js/carte.js"></script>
+<script src="/static/js/data.js"></script>
+<script src="/static/js/carte.js"></script>
+
 
 </body>
 
