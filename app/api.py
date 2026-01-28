@@ -1,6 +1,6 @@
 from flask import jsonify,Blueprint,request
-import database as db
-from statistical import create_graph_bar,create_graph_line
+import app.database as db
+from app.statistical import create_graph_bar,create_graph_line
 
 api = Blueprint("api",__name__)
 
@@ -26,11 +26,12 @@ def get_sensors_status():
     Un capteur est considere "online" s'il a envoye des donnees dans les 2 dernieres minutes.
     """
     from datetime import datetime, timedelta
+    from zoneinfo import ZoneInfo
 
     sensors_status = db.get_all_sensors_status()
     result = []
 
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Zurich"))
 
     # Recuperer les noms personnalises depuis esp32_devices
     esp32_devices = db.get_all_esp32_devices()
@@ -216,7 +217,8 @@ def api_data(type_str):
         return str(value) if value is not None else "NULL"
     else:
         return "Aucune donnée"
-    
+
+
 def api_datas_list(type_str, limit=100,date_filter="today"):
     """Retourne une liste des dernières valeurs pour une colonne"""
     if type_str == "hour":
@@ -379,18 +381,31 @@ def get_history2():
         "pressure": press_list
     })
 
-@api.route("/statistical_refresh", methods=["GET"])
+@api.route("/statistical", methods=["GET"])
 def refresh_statistical():
     try :
         selected_date = request.args.get("date",type=str)
     except:
         selected_date = "today"
-
-# génèration des graphiques quand la page est appelée
-    create_graph_line(["temperature1","temperature2"],"hour",label_x="Hours",label_y="°C",line_title=["Sensor 1","Sensor 2"],title="Temperatures", color =["tab:blue","tab:red"],date=selected_date)
-    create_graph_line(["pressure1","pressure2"],"hour",label_x="Hours",label_y="hPa",line_title=["Sensor 1","Sensor 2"],title="Pressures", color =["tab:blue","tab:red"],date=selected_date)
-    create_graph_bar(["humidity1","humidity2"],"hour",label_x="Hours",label_y="%",bar_title=["Sensor 1","Sensor 2"],title="Humidity levels", color =["tab:blue","tab:red"],date=selected_date)
-    return "refresh",200
+    data_type = request.args.get("type", default="None", type=str)
+    if data_type :
+        data1 = api_datas_list(f"{data_type}1", limit=50, date_filter=selected_date)
+        data2 = api_datas_list(f"{data_type}2", limit=50, date_filter=selected_date)
+        hours = api_datas_list("hour", limit=50, date_filter=selected_date)
+    else :
+        return jsonify(data_final = {
+        "data1": [],
+        "data2": [],
+        "hours": []
+    }),400
+    
+    data_final = {
+        "data1": data1,
+        "data2": data2,
+        "hours": hours
+    }
+    
+    return jsonify(data_final),200
 
 
 
@@ -458,9 +473,10 @@ def list_esp32_devices():
     Pour l'interface admin.
     """
     from datetime import datetime
+    from zoneinfo import ZoneInfo
 
     devices = db.get_all_esp32_devices()
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Zurich"))
 
     for device in devices:
         # Calculer le statut en ligne/hors ligne
@@ -543,18 +559,19 @@ def daily_summary():
     # /api/daily_summary?sensor_id=1&limit=7
     sensor_id = request.args.get("sensor_id", type=int)
     limit = request.args.get("limit", default=7, type=int)
+    date = request.args.get("date", default="today", type=str)
 
     if sensor_id not in (1, 2):
         return jsonify([]), 400
 
-    data = summary(sensor_id, limit)
+    data = summary(sensor_id, limit,date_filter=date)
 
     if not data:
         return jsonify([])
     return jsonify(data)
 
 
-def summary(sensor_id, limit=7):
+def summary(sensor_id, limit=7,date_filter="today"):
     """
     Calcule les max/min par jour pour un capteur donné.
     Si db.read_data ne supporte pas group_by, on fait le regroupement en Python.
@@ -564,12 +581,21 @@ def summary(sensor_id, limit=7):
     # Récupérer TOUTES les données (ou les N dernières)
     try:
         # Récupérer les données avec date, temperature, humidity, pressure
-        results = db.read_data(
+        if date_filter != "today":
+            results = db.read_data(
             device_name,
             column="date, temperature, humidity, pressure",
-            order="date DESC",  # Du plus récent au plus ancien
-            limit=limit    # Récupérer jusqu'à 24h par jour (sécurité)
+            where=f"date = '{date_filter}'",
+            order="id DESC",  # Du plus récent au plus ancien Par id
+            limit=limit       # Récupérer jusqu'à 24h par jour (sécurité)
         )
+        else:
+            results = db.read_data(
+                device_name,
+                column="date, temperature, humidity, pressure",
+                order="id DESC",  # Du plus récent au plus ancien Par id
+                limit=limit    # Récupérer jusqu'à 24h par jour (sécurité)
+            )
     except Exception as e:
         print(f"Erreur dans summary({sensor_id}): {e}")
         return []

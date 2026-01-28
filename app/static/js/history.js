@@ -91,6 +91,8 @@ async function refresh_date() {
     date_selected = document.getElementById("date").value;
     loadHistory("1",date_selected = date_selected);
     loadHistory("2",date_selected = date_selected);
+    fetchSummary("1",dateFilter = date_selected);
+    fetchSummary("2",dateFilter = date_selected);
 }
 
 // Attacher l'événement au bouton, si présent
@@ -99,10 +101,20 @@ if (refreshBtn) {
     refreshBtn.addEventListener("click", refresh_date);
 }
 document.addEventListener('DOMContentLoaded', () => {
-    loadDates(); // 👈 Charger les dates au chargement
+    loadDates(); // Charger les dates au chargement
     refresh_date();
 });
 
 // Actualiser toutes les 20 secondes
 setInterval(() => loadHistory("1",date_selected = date_selected), 20000);
 setInterval(() => loadHistory("2",date_selected = date_selected), 20000);
+// petit script inutile pour rendre le bouton swag
+document.querySelectorAll('input[type=button]').forEach(button => {
+    button.addEventListener('click', function () {
+        this.classList.add('jello');
+        // Supprime la classe après la fin de l'animation pour permettre une nouvelle animation
+        this.addEventListener('animationend', function () {
+            this.classList.remove('jello');
+        }, { once: true });
+    });
+});

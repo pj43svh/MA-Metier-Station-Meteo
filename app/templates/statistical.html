@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="/static/style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="10"> <!-- Rafraîchit toutes les 10s -->
     <title>Weather station - Statistical</title>
     <link rel="icon" type="image/x-icon" href="/static/icone.png">
 </head>
@@ -45,24 +44,20 @@
             <input type="button" value="Refresh" id="refresh_btn">
 
         <div class="content">
-            <div class="sensors">
+            <div class="sensors graphique">
 
-                <h1>Sensor</h1>
 
                 <div class="card" id="graphique_pluie">
-                    <img src="/static/graph_Temperatures.png" alt="Graphique Temperature"
-                        style="max-width: 100%; height: auto;" class="graphique">
+                    <canvas id="temperature"></canvas>
                 </div>
                 
 
                 <div class="card" id="graphique_pression">
-                    <img src="/static/graph_Pressures.png" alt="Graphique Pressure"
-                        style="max-width: 100%; height: auto;" class="graphique">
+                    <canvas id="pressure"></canvas>
                 </div>
 
                 <div class="card" id="graphique_humidite">
-                    <img src="/static/graph_Humidity levels.png" alt="Graphique Humidité"
-                        style="max-width: 100%; height: auto;" class="graphique">
+                    <canvas id="humidity"></canvas>
                 </div>
             </div>
 
@@ -70,7 +65,7 @@
     </div>
 
 
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/static/js/statistical.js"></script>
 </body>
 

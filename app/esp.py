@@ -3,12 +3,16 @@
 # Modifications : correction de la gestion des erreurs
 # Fonction : recevoir les requêtes POST des ESP32 et ajouter les données à la base de données
 
-from database import add_data, create_table_if_not_exists, get_all_sensors, register_esp32
+from app.database import add_data, create_table_if_not_exists, get_all_sensors, register_esp32
 from flask import request, Blueprint, jsonify
 from werkzeug.exceptions import InternalServerError
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import re
+
+# Fuseau horaire Suisse (Berne)
+TIMEZONE_SUISSE = ZoneInfo("Europe/Zurich")
 
 
 esp = Blueprint("esp",__name__)
@@ -31,8 +35,10 @@ def esp_request():
     pressure = data.get('pression')
     mac_address = data.get('mac_address')  # Optionnel
 
-    date_now = datetime.now().strftime("%Y-%m-%d")
-    hour_now = datetime.now().strftime("%H:%M:%S")
+    # Utiliser l'heure suisse (Berne)
+    now_suisse = datetime.now(TIMEZONE_SUISSE)
+    date_now = now_suisse.strftime("%Y-%m-%d")
+    hour_now = now_suisse.strftime("%H:%M:%S")
     ts_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S") #timestamp
 
     # Extraire le numero du capteur (ATOM_001 -> 1, ATOM_002 -> 2, etc.)

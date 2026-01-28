@@ -13,7 +13,7 @@ def create_graph_line(var, echelle, label_x="Date", label_y="Value", line_title=
     """
     Cette fonction sert a créer un graphique de type linéaire
     """
-    from api import api_datas_list # on utilise la fonction api_datas_list pour récupérer 24 données selon la date
+    from app.api import api_datas_list # on utilise la fonction api_datas_list pour récupérer 24 données selon la date
 
     hour = api_datas_list(echelle,limit=limit,date_filter=date)
 
@@ -65,7 +65,7 @@ def create_graph_bar(var,echelle,label_x="abscissa",label_y="height",bar_title=[
     """
     Cette fonction sert a créer un graphique de type barres
     """
-    from api import api_datas_list
+    from app.api import api_datas_list
 
     hour = api_datas_list(echelle,limit=limit,date_filter=date)
 

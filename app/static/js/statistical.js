@@ -1,27 +1,235 @@
-let date_selected = "today"; // valeur par défaut
+let temperatureChart = null;
+let pressureChart = null;
+let humidityChart = null;
 
-// Fonction pour charger l'historique depuis l'API
-async function refresh_statistical(dateFilter = "today") {
-    // on va envoyer la date sélectionnée au serveur avec la methode GET
-    const url = `/api/statistical_refresh?date=${dateFilter}`;
+
+async function loadStatictical(data_type, dateFilter = "today") {
+    const url = `/api/statistical?type=${data_type}&date=${dateFilter}`;
     const response = await fetch(url);
-    if (!response.ok) throw new Error('Erreur du serveur');
-    // reload the current page
-    window.location.reload();
+    const data = await response.json();
+    console.log(data)
+    return data;
 }
 
 
-// Fonction pour charger les dates uniques depuis l'API
+
+async function fetchTemperatureData(date_selected = "today") {
+    const json_temp = await loadStatictical("temperature", dateFilter = date_selected);
+    let labels = json_temp.hours;
+    let datas1 = json_temp.data1;
+    let datas2 = json_temp.data2;
+
+    const temperature = document.getElementById('temperature');
+
+    temperatureChart = new Chart(temperature, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Sensor 1',
+                    data: datas1,
+                    borderColor: 'rgba(15, 155, 236, 1)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Sensor 2',
+                    data: datas2,
+                    borderColor: 'rgba(245, 24, 72, 1)',
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+    maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: 'rgba(53, 53, 53, 1)'
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Hours',
+                        color: 'rgba(53, 53, 53, 1)'
+                    },
+                    ticks: {
+                        color: 'rgba(53, 53, 53, 1)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '°C',
+                        color: 'rgba(53, 53, 53, 1)'
+                    },
+                    ticks: {
+                        color: 'rgba(53, 53, 53, 1)'
+                    },
+                    min: 0
+
+                }
+            }
+        }
+    });
+}
+
+async function fetchPressureData(date_selected = "today") {
+    const json_temp = await loadStatictical("pressure", dateFilter = date_selected);
+    let labels = json_temp.hours;
+    let datas1 = json_temp.data1;
+    let datas2 = json_temp.data2;
+
+    const pressure = document.getElementById('pressure');
+
+    pressureChart = new Chart(pressure, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Sensor 1',
+                    data: datas1,
+                    borderColor: 'rgba(15, 155, 236, 1)',
+                    tension: 0.1,
+                },
+                {
+                    label: 'Sensor 2',
+                    data: datas2,
+                    borderColor: 'rgba(245, 24, 72, 1)',
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+    maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: 'rgba(53, 53, 53, 1)'
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Hours',
+                        color: 'rgba(53, 53, 53, 1)'
+                    },
+                    ticks: {
+                        color: 'rgba(53, 53, 53, 1)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '°C',
+                        color: 'rgba(53, 53, 53, 1)'
+                    },
+                    ticks: {
+                        color: 'rgba(53, 53, 53, 1)'
+                    },
+                    min: 0
+
+                }
+            }
+        }
+    });
+}
+
+async function fetchHumidityData(date_selected = "today") {
+    const json_temp = await loadStatictical("humidity", dateFilter = date_selected);
+    let labels = json_temp.hours;
+    let datas1 = json_temp.data1;
+    let datas2 = json_temp.data2;
+
+    const humidity = document.getElementById('humidity');
+
+    humidityChart = new Chart(humidity, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Sensor 1',
+                data: datas1,
+                backgroundColor: 'rgba(15, 155, 236, 1)'
+            },
+            {
+                label: 'Sensor 2',
+                data: datas2,
+                backgroundColor: 'rgba(245, 24, 72, 1)'
+            }
+        ]
+    },
+    options: {
+    responsive: true,
+    maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    color: 'rgba(53, 53, 53, 1)'
+                }
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+            }
+        },
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Hours',
+                    color: 'rgba(53, 53, 53, 1)'
+                },
+                ticks: {
+                    color: 'rgba(53, 53, 53, 1)'
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: '%',
+                    color: 'rgba(53, 53, 53, 1)'
+                },
+                ticks: {
+                    color: 'rgba(53, 53, 53, 1)'
+                },
+                min: 0
+            }
+        }
+    }
+});
+};
+
 async function loadDates() {
     try {
         const response = await fetch('/api/dates_unique');
         if (!response.ok) throw new Error('Erreur du serveur');
-
+        
         const dates = await response.json();
-
+        
         const selectList = document.getElementById("date");
-
-
+        
+        
         // Ajouter les dates uniques
         for (const date of dates) {
             const option = document.createElement('option');
@@ -29,20 +237,57 @@ async function loadDates() {
             option.textContent = date;
             selectList.appendChild(option);
         }
-
-
+        
+        
     } catch (error) {
         console.error('Erreur lors du chargement des dates :', error);
         const selectList = document.getElementById("date");
         selectList.innerHTML = '<option value="">Erreur</option>';
     }
 }
-// Fonction pour calculer (ex: avec la date sélectionnée)
+
+async function updateTemperature(date_selected="today") {
+    const json_temp = await loadStatictical("temperature", dateFilter = date_selected);
+    let labels = json_temp.hours;
+    let datas1 = json_temp.data1;
+    let datas2 = json_temp.data2;
+    temperatureChart.data.labels = labels;
+    temperatureChart.data.datasets[0].data = datas1;
+    temperatureChart.data.datasets[1].data = datas2;
+    temperatureChart.update();
+}
+
+async function updatePressure(date_selected="today") {
+    const json_pres = await loadStatictical("pressure", dateFilter = date_selected);
+    let labels = json_pres.hours;
+    let datas1 = json_pres.data1;
+    let datas2 = json_pres.data2;
+    pressureChart.data.labels = labels;
+    pressureChart.data.datasets[0].data = datas1;
+    pressureChart.data.datasets[1].data = datas2;
+    pressureChart.update();
+}
+
+async function updateHumidity(date_selected="today") {
+    const json_humi = await loadStatictical("humidity", dateFilter = date_selected);
+    let label = json_humi.hours;
+    let datas1 = json_humi.data1;
+    let datas2 = json_humi.data2;
+    humidityChart.data.labels = label;
+    humidityChart.data.datasets[0].data = datas1;
+    humidityChart.data.datasets[1].data = datas2;
+    humidityChart.update();
+}
+
+let date_selected = "today";
+
 async function refresh_date() {
     const select_list = document.getElementById("date");
     console.log("button pressed ", select_list.value);
     date_selected = document.getElementById("date").value;
-    refresh_statistical(dateFilter = date_selected);
+    updateTemperature(date_selected);
+    updatePressure(date_selected);
+    updateHumidity(date_selected);
 }
 
 // Attacher l'événement au bouton, si présent
@@ -51,11 +296,11 @@ if (refreshBtn) {
     refreshBtn.addEventListener("click", refresh_date);
 }
 document.addEventListener('DOMContentLoaded', () => {
+    fetchTemperatureData();
+    fetchPressureData();
+    fetchHumidityData();
     loadDates(); // Charger les dates au chargement
 });
-
-// Actualiser toutes les 10 secondes
-setInterval(() => refresh_statistical(dateFilter = date_selected), 10000);
 
 // petit script inutile pour rendre le bouton swag
 document.querySelectorAll('input[type=button]').forEach(button => {
@@ -67,3 +312,7 @@ document.querySelectorAll('input[type=button]').forEach(button => {
         }, { once: true });
     });
 });
+
+setInterval(() => updateTemperature(date_selected = date_selected), 20000);
+setInterval(() => updatePressure(date_selected = date_selected), 20000);
+setInterval(() => updateHumidity(date_selected = date_selected), 20000);
