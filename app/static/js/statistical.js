@@ -29,7 +29,7 @@ async function fetchTemperatureData(date_selected = "today") {
                 {
                     label: 'Sensor 1',
                     data: datas1,
-                    borderColor: 'rgba(15, 155, 236, 1)',
+                    borderColor: 'rgba(0, 162, 255, 1)',
                     tension: 0.1
                 },
                 {
@@ -99,7 +99,7 @@ async function fetchPressureData(date_selected = "today") {
                 {
                     label: 'Sensor 1',
                     data: datas1,
-                    borderColor: 'rgba(15, 155, 236, 1)',
+                    borderColor: 'rgba(0, 162, 255, 1)',
                     tension: 0.1,
                 },
                 {
@@ -145,7 +145,7 @@ async function fetchPressureData(date_selected = "today") {
                     ticks: {
                         color: 'rgba(53, 53, 53, 1)'
                     },
-                    min: 0
+                    min: 850
 
                 }
             }
@@ -169,7 +169,7 @@ async function fetchHumidityData(date_selected = "today") {
             {
                 label: 'Sensor 1',
                 data: datas1,
-                backgroundColor: 'rgba(15, 155, 236, 1)'
+                backgroundColor: 'rgba(0, 162, 255, 1)'
             },
             {
                 label: 'Sensor 2',
@@ -213,7 +213,8 @@ async function fetchHumidityData(date_selected = "today") {
                 ticks: {
                     color: 'rgba(53, 53, 53, 1)'
                 },
-                min: 0
+                min: 0,
+                max:100
             }
         }
     }
