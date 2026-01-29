@@ -281,6 +281,7 @@ async function updateHumidity(date_selected="today") {
 }
 
 let date_selected = "today";
+let limit = 20;
 
 async function refresh_date() {
     const select_list = document.getElementById("date");
