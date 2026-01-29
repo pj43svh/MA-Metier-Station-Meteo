@@ -17,4 +17,4 @@ dans le tableau ci dessous, veuillez mettre un emoji ❌ les périodes où vous 
 |9|✅|❌|✅|✅|✅|
 |10|✅|❌|✅|✅|✅|
 
-Rangements :
+
