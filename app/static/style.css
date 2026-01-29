@@ -59,7 +59,8 @@ nav li a {
     color: inherit;
     margin: 10px;
     font-size: 1em;
-    text-decoration: underline;
+        animation: link-normal 0.4s both;
+
 }
 
 nav a{
@@ -84,7 +85,29 @@ nav li {
 }
 
 nav li a:hover {
-    font-weight:bold;
+    animation: link-hover 0.4s both;
+}
+
+@keyframes link-hover {
+    0% {
+        text-shadow: 0 0 0px rgba(255, 255, 255, 0.6);
+        font-size: inherit;
+    }
+    100% {
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+        font-size: 20px;
+    }    
+}
+
+@keyframes link-normal {
+    0% {
+        text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+        font-size: 20px;
+    }
+    100% {
+        text-shadow: 0 0 0px rgba(255, 255, 255, 0.6);
+        font-size: inherit;
+    }    
 }
 
 nav footer{
@@ -684,9 +707,6 @@ nav li a {
     color: #ffffff;
 }
 
-nav li a:hover {
-    text-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
-}
 nav {
     background: rgba(255, 255, 255, 0.08) ;
     border: 1px solid rgba(255, 255, 255, 0.18);
