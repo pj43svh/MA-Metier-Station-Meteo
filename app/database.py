@@ -139,7 +139,7 @@ def get_sensor_last_activity(table_name):
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute(f"SELECT date, hour FROM `{table_name}` ORDER BY id DESC LIMIT 1")
+        cursor.execute(f"SELECT date, hour FROM `{table_name}` WHERE temperature IS NOT NULL ORDER BY id DESC LIMIT 1")
         result = cursor.fetchone()
         if result:
             return {"date": result[0], "hour": result[1]}
