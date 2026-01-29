@@ -96,6 +96,11 @@ async function refresh_date() {
     const select_limit = document.getElementById("limit");
     console.log("button pressed ", select_limit.value);
     limit_selected = document.getElementById("limit").value;
+    if (limit_selected < 1) {
+        alert("Limit must be at least 1");
+        document.getElementById("limit").value = 20;
+        limit_selected = 20;
+    }
 
     loadHistory("1",date_selected = date_selected,limit=limit_selected);
     loadHistory("2",date_selected = date_selected,limit=limit_selected);
