@@ -1,5 +1,5 @@
 #pragma once
 
 // Identifiants du portail de config (AP)
-const char* AP_SSID   = "Apéro ? ^-^";
-const char* AP_PASS   = "bzwd9335";
+const char* AP_SSID   = "VOTRE_AP_SSID";
+const char* AP_PASS   = "VOTRE_AP_PASS";

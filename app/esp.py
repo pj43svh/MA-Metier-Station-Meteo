@@ -3,7 +3,11 @@
 # Modifications : correction de la gestion des erreurs
 # Fonction : recevoir les requêtes POST des ESP32 et ajouter les données à la base de données
 
-from app.database import add_data, create_table_if_not_exists, get_all_sensors, register_esp32
+try:
+    from app.database import add_data, create_table_if_not_exists, get_all_sensors, register_esp32
+except:
+    from database import add_data, create_table_if_not_exists, get_all_sensors, register_esp32
+
 from flask import request, Blueprint, jsonify
 from werkzeug.exceptions import InternalServerError
 
@@ -87,8 +91,7 @@ def esp_request():
             "humidity": None,
             "pressure": None,
             "date": date_now,
-            "hour": hour_now,
-            "ts": ts_now #
+            "hour": hour_now
         })
 
     # Succès uniquement si les deux insertions ont réussi

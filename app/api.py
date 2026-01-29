@@ -1,6 +1,8 @@
 from flask import jsonify,Blueprint,request
-import app.database as db
-from app.statistical import create_graph_bar,create_graph_line
+try:
+    import app.database as db
+except:
+    import database as db
 
 api = Blueprint("api",__name__)
 
@@ -256,7 +258,7 @@ def api_datas_list(type_str, limit=100,date_filter="today"):
         )
         except:
             print("Wrong date :",date_filter)
-            return
+            return []
     if not results:
         return []
     

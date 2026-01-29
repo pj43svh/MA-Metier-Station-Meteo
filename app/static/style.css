@@ -742,3 +742,45 @@ nav .logo {
     }
 
 }
+
+
+/* ==ABOUT=== */
+.about-grid{
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+/* liste tech*/
+.tech-list{
+  margin: 0;
+  padding-left: 18px;
+}
+
+.tech-list li{
+  margin: 6px 0;
+}
+
+.about-grid .card{
+  width: 100%;
+}
+
+
+/* responsive */
+@media screen and (max-width: 1200px){
+  .about-grid{
+    grid-template-columns: repeat(2, minmax(260px, 1fr));
+  }
+  .card-wide{
+    grid-column: 1 / -1;
+  }
+}
+
+@media screen and (max-width: 800px){
+  .about-grid{
+    grid-template-columns: 1fr;
+  }
+}
