@@ -72,7 +72,7 @@ def get_sensors_status():
                 if diff.total_seconds() < 120:  # 2 minutes
                     sensor_info["status"] = "online"
                     sensor_info["status_text"] = "En ligne"
-                elif diff.total_seconds() < 300:  # 5 minutes
+                elif diff.total_seconds() < 600:  # 10 minutes
                     sensor_info["status"] = "recent"
                     sensor_info["status_text"] = f"Vu il y a {int(diff.total_seconds() // 60)} min"
                 else:
