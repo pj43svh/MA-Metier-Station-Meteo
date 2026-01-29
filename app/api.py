@@ -221,11 +221,14 @@ def api_data(type_str):
         return "Aucune donnée"
 
 
-def api_datas_list(type_str, limit=100,date_filter="today"):
+def api_datas_list(type_str, limit=100, date_filter="today"):
     """Retourne une liste des dernières valeurs pour une colonne"""
+    if not type_str or len(type_str) < 2:
+        print(f"❌ type_str invalide : '{type_str}'")
+        return []
+
     if type_str == "hour":
         col = "hour"
-        # Trouver un capteur qui a des donnees pour l'axe des heures
         sensors = db.get_all_sensors()
         device_name = sensors[0] if sensors else "esp1"
     elif type_str == "date":
@@ -233,12 +236,17 @@ def api_datas_list(type_str, limit=100,date_filter="today"):
         sensors = db.get_all_sensors()
         device_name = sensors[0] if sensors else "esp1"
     else:
+        # Vérifier que le dernier caractère est un chiffre
+        if not type_str[-1].isdigit():
+            print(f"❌ device_id invalide dans : '{type_str}'")
+            return []
         col = type_str[:-1]
-        device_name = "esp"+type_str[-1]
+        device_name = "esp" + type_str[-1]
 
     ALLOWED_COLUMNS = {"temperature", "humidity", "pressure", "date", "hour"}
 
     if col not in ALLOWED_COLUMNS:
+        print(f"❌ Colonne non autorisée : '{col}'")
         return []
 
     # Tri par id DESC (du plus récent au plus ancien)
@@ -248,25 +256,25 @@ def api_datas_list(type_str, limit=100,date_filter="today"):
             column=col,
             order=f"id DESC LIMIT {limit}"
         )
-    else :
+    else:
         try:
             results = db.read_data(
-            device_name,
-            column=col,
-            where=f"date = '{date_filter}'",
-            order=f"id DESC LIMIT {limit}"
-        )
-        except:
-            print("Wrong date :",date_filter)
+                device_name,
+                column=col,
+                where=f"date = '{date_filter}'",
+                order=f"id DESC LIMIT {limit}"
+            )
+        except Exception as e:
+            print(f"❌ Erreur lors de la lecture avec date '{date_filter}' : {e}")
             return []
+
     if not results:
         return []
-    
 
     values = [row[0] for row in results]
-    return values[::-1]  # Ne pas inverser — tu veux du plus récent au plus ancien
 
-
+    # Inverser pour avoir le plus ancien en premier (si nécessaire)
+    return values[::-1]
 # exemple d'utilisation
 # temp = api_data("temperature1")
 
@@ -346,11 +354,19 @@ def get_history1():
         selected_date = request.args.get("date",type=str)
     except:
         selected_date = "today"
-    date_list = api_datas_list("date", limit=50, date_filter=selected_date)
-    hour_list = api_datas_list("hour", limit=50, date_filter=selected_date)
-    temp_list = api_datas_list("temperature1", limit=50, date_filter=selected_date)
-    hum_list = api_datas_list("humidity1", limit=50, date_filter=selected_date)
-    press_list = api_datas_list("pressure1", limit=50, date_filter=selected_date)
+        print("Date non valide, mis a today par defaut")
+
+    try :
+        selected_limit = request.args.get("limit",type=int)
+    except:
+        selected_limit = 50
+        print("Limit non valide, mis a 50 par defaut")
+
+    date_list = api_datas_list("date", limit=selected_limit, date_filter=selected_date)
+    hour_list = api_datas_list("hour", limit=selected_limit, date_filter=selected_date)
+    temp_list = api_datas_list("temperature1", limit=selected_limit, date_filter=selected_date)
+    hum_list = api_datas_list("humidity1", limit=selected_limit, date_filter=selected_date)
+    press_list = api_datas_list("pressure1", limit=selected_limit, date_filter=selected_date)
 
     return jsonify({
         "date": date_list,
@@ -368,12 +384,19 @@ def get_history2():
         selected_date = request.args.get("date",type=str)
     except:
         selected_date = "today"
+        print("Date non valide, mis a today par defaut")
+
+    try :
+        selected_limit = request.args.get("limit",type=int)
+    except:
+        selected_limit = 50
+        print("Limit non valide, mis a 50 par defaut")
     
-    date_list = api_datas_list("date", limit=50, date_filter=selected_date)
-    hour_list = api_datas_list("hour", limit=50, date_filter=selected_date)
-    temp_list = api_datas_list("temperature2", limit=50, date_filter=selected_date)
-    hum_list = api_datas_list("humidity2", limit=50, date_filter=selected_date)
-    press_list = api_datas_list("pressure2", limit=50, date_filter=selected_date)
+    date_list = api_datas_list("date", limit=selected_limit, date_filter=selected_date)
+    hour_list = api_datas_list("hour", limit=selected_limit, date_filter=selected_date)
+    temp_list = api_datas_list("temperature2", limit=selected_limit, date_filter=selected_date)
+    hum_list = api_datas_list("humidity2", limit=selected_limit, date_filter=selected_date)
+    press_list = api_datas_list("pressure2", limit=selected_limit, date_filter=selected_date)
 
     return jsonify({
         "date": date_list,
@@ -383,17 +406,30 @@ def get_history2():
         "pressure": press_list
     })
 
+#########################___API POUR LES GRAPHIQUES___##########################
+
+
 @api.route("/statistical", methods=["GET"])
 def refresh_statistical():
     try :
         selected_date = request.args.get("date",type=str)
     except:
         selected_date = "today"
+        print("Date non valide, mis a today par defaut")
+
+    try :
+        selected_limit = request.args.get("limit",default=50,type=int)
+        
+    except:
+        selected_limit =20
+        print("Limit non valide, mis a 20 par defaut")
+
     data_type = request.args.get("type", default="None", type=str)
     if data_type :
-        data1 = api_datas_list(f"{data_type}1", limit=50, date_filter=selected_date)
-        data2 = api_datas_list(f"{data_type}2", limit=50, date_filter=selected_date)
-        hours = api_datas_list("hour", limit=50, date_filter=selected_date)
+        data1 = api_datas_list(f"{data_type}1", date_filter=selected_date,limit=selected_limit)
+        data2 = api_datas_list(f"{data_type}2", date_filter=selected_date,limit=selected_limit)
+        hours = api_datas_list("hour", date_filter=selected_date,limit=selected_limit)
+        print(selected_limit,selected_date,data_type)
     else :
         return jsonify(data_final = {
         "data1": [],

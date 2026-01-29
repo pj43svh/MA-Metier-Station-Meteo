@@ -15,7 +15,9 @@
         <img src="static/icone.png" alt="icone" id="logo" class="logo">
         <header>
             <hr>
-            <a href="/"><h2>Home</h2></a>
+            <a href="/">
+                <h2>Home</h2>
+            </a>
             <hr>
             <ul>
                 <li><a href="/">Datas</a></li>
@@ -37,12 +39,12 @@
     </nav>
     <div>
         <h1>STATISTICAL</h1>
-        
-            <select name="date" id="date">
-                <option value="today" selected>Today</option>
-            </select>
-            <input type="number" name="limit" id="limit" value="20">
-            <input type="button" value="Refresh" id="refresh_btn">
+
+        <select name="date" id="date">
+            <option value="today" selected>Today</option>
+        </select>
+        <input type="number" name="limit" id="limit" value="20" max="50" min="10">
+        <input type="button" value="Refresh" id="refresh_btn">
 
         <div class="content">
             <div class="sensors graphique">
@@ -51,7 +53,7 @@
                 <div class="card" id="graphique_pluie">
                     <canvas id="temperature"></canvas>
                 </div>
-                
+
 
                 <div class="card" id="graphique_pression">
                     <canvas id="pressure"></canvas>
@@ -66,8 +68,8 @@
     </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/static/js/statistical.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/statistical.js"></script>
 </body>
 
 </html>

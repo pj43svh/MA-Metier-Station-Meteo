@@ -3,8 +3,8 @@ let pressureChart = null;
 let humidityChart = null;
 
 
-async function loadStatictical(data_type, dateFilter = "today") {
-    const url = `/api/statistical?type=${data_type}&date=${dateFilter}`;
+async function loadStatictical(data_type, dateFilter = "today",limit=20) {
+    const url = `/api/statistical?type=${data_type}&date=${dateFilter}&limit=${limit}`;
     const response = await fetch(url);
     const data = await response.json();
     console.log(data)
@@ -13,8 +13,8 @@ async function loadStatictical(data_type, dateFilter = "today") {
 
 
 
-async function fetchTemperatureData(date_selected = "today") {
-    const json_temp = await loadStatictical("temperature", dateFilter = date_selected);
+async function fetchTemperatureData(date_selected = "today",limit=20) {
+    const json_temp = await loadStatictical("temperature", dateFilter = date_selected,limit=limit);
     let labels = json_temp.hours;
     let datas1 = json_temp.data1;
     let datas2 = json_temp.data2;
@@ -83,8 +83,8 @@ async function fetchTemperatureData(date_selected = "today") {
     });
 }
 
-async function fetchPressureData(date_selected = "today") {
-    const json_temp = await loadStatictical("pressure", dateFilter = date_selected);
+async function fetchPressureData(date_selected = "today",limit=20) {
+    const json_temp = await loadStatictical("pressure", dateFilter = date_selected,limit=limit);
     let labels = json_temp.hours;
     let datas1 = json_temp.data1;
     let datas2 = json_temp.data2;
@@ -152,8 +152,8 @@ async function fetchPressureData(date_selected = "today") {
     });
 }
 
-async function fetchHumidityData(date_selected = "today") {
-    const json_temp = await loadStatictical("humidity", dateFilter = date_selected);
+async function fetchHumidityData(date_selected = "today",limit=20) {
+    const json_temp = await loadStatictical("humidity", dateFilter = date_selected,limit=limit);
     let labels = json_temp.hours;
     let datas1 = json_temp.data1;
     let datas2 = json_temp.data2;
@@ -246,8 +246,8 @@ async function loadDates() {
     }
 }
 
-async function updateTemperature(date_selected="today") {
-    const json_temp = await loadStatictical("temperature", dateFilter = date_selected);
+async function updateTemperature(date_selected="today",limit=20) {
+    const json_temp = await loadStatictical("temperature", dateFilter = date_selected,limit=limit);
     let labels = json_temp.hours;
     let datas1 = json_temp.data1;
     let datas2 = json_temp.data2;
@@ -257,8 +257,8 @@ async function updateTemperature(date_selected="today") {
     temperatureChart.update();
 }
 
-async function updatePressure(date_selected="today") {
-    const json_pres = await loadStatictical("pressure", dateFilter = date_selected);
+async function updatePressure(date_selected="today",limit=20) {
+    const json_pres = await loadStatictical("pressure", dateFilter = date_selected,limit=limit);
     let labels = json_pres.hours;
     let datas1 = json_pres.data1;
     let datas2 = json_pres.data2;
@@ -268,8 +268,8 @@ async function updatePressure(date_selected="today") {
     pressureChart.update();
 }
 
-async function updateHumidity(date_selected="today") {
-    const json_humi = await loadStatictical("humidity", dateFilter = date_selected);
+async function updateHumidity(date_selected="today",limit=20) {
+    const json_humi = await loadStatictical("humidity", dateFilter = date_selected,limit=limit);
     let label = json_humi.hours;
     let datas1 = json_humi.data1;
     let datas2 = json_humi.data2;
@@ -280,15 +280,24 @@ async function updateHumidity(date_selected="today") {
 }
 
 let date_selected = "today";
-let limit = 20;
+let limit_selected = 20;
 
 async function refresh_date() {
     const select_list = document.getElementById("date");
     console.log("button pressed ", select_list.value);
     date_selected = document.getElementById("date").value;
-    updateTemperature(date_selected);
-    updatePressure(date_selected);
-    updateHumidity(date_selected);
+
+    const select_limit = document.getElementById("date");
+    console.log("button pressed ", select_limit.value);
+    limit_selected = document.getElementById("limit").value;
+    if (limit_selected < 1) {
+        alert("Limit must be at least 1");
+        document.getElementById("limit").value = 20;
+        limit_selected = 20;
+    }
+    updateTemperature(date_selected=date_selected,limit=limit_selected);
+    updatePressure(date_selected=date_selected,limit=limit_selected);
+    updateHumidity(date_selected= date_selected,limit=limit_selected);
 }
 
 // Attacher l'événement au bouton, si présent
@@ -314,6 +323,6 @@ document.querySelectorAll('input[type=button]').forEach(button => {
     });
 });
 
-setInterval(() => updateTemperature(date_selected = date_selected), 20000);
-setInterval(() => updatePressure(date_selected = date_selected), 20000);
-setInterval(() => updateHumidity(date_selected = date_selected), 20000);
+setInterval(() => updateTemperature(date_selected = date_selected,limit=limit_selected), 20000);
+setInterval(() => updatePressure(date_selected = date_selected,limit=limit_selected), 20000);
+setInterval(() => updateHumidity(date_selected = date_selected,limit=limit_selected), 20000);

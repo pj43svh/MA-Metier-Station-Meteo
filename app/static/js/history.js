@@ -1,9 +1,12 @@
 let date_selected = "today"; // valeur par défaut
+let limit_selected = 50; // valeur par défaut
+
+// Fonction pour récupérer le résumé des données
 
 // Fonction pour charger les données depuis l'API Flask
-async function loadHistory(sensorId, dateFilter = "today") {
+async function loadHistory(sensorId, dateFilter = "today",limit=50) {
     try {
-        const url = `/api/history${sensorId}?date=${dateFilter}`;
+        const url = `/api/history${sensorId}?date=${dateFilter}&limit=${limit}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Erreur du serveur');
         
@@ -89,10 +92,15 @@ async function refresh_date() {
     const select_list = document.getElementById("date");
     console.log("button pressed ", select_list.value);
     date_selected = document.getElementById("date").value;
-    loadHistory("1",date_selected = date_selected);
-    loadHistory("2",date_selected = date_selected);
-    fetchSummary("1",dateFilter = date_selected);
-    fetchSummary("2",dateFilter = date_selected);
+
+    const select_limit = document.getElementById("limit");
+    console.log("button pressed ", select_limit.value);
+    limit_selected = document.getElementById("limit").value;
+
+    loadHistory("1",date_selected = date_selected,limit=limit_selected);
+    loadHistory("2",date_selected = date_selected,limit=limit_selected);
+    fetchSummary("1",dateFilter = date_selected,limit=limit_selected);
+    fetchSummary("2",dateFilter = date_selected,limit=limit_selected);
 }
 
 // Attacher l'événement au bouton, si présent
@@ -106,8 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Actualiser toutes les 20 secondes
-setInterval(() => loadHistory("1",date_selected = date_selected), 20000);
-setInterval(() => loadHistory("2",date_selected = date_selected), 20000);
+setInterval(() => loadHistory("1",date_selected = date_selected,limit=limit_selected), 20000);
+setInterval(() => loadHistory("2",date_selected = date_selected,limit=limit_selected), 20000);
+
 // petit script inutile pour rendre le bouton swag
 document.querySelectorAll('input[type=button]').forEach(button => {
     button.addEventListener('click', function () {
