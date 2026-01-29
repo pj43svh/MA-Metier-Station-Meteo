@@ -1,10 +1,8 @@
 from flask import jsonify,Blueprint,request
 try:
     import app.database as db
-    from app.statistical import create_graph_bar,create_graph_line
 except:
     import database as db
-    from statistical import create_graph_bar,create_graph_line
 
 api = Blueprint("api",__name__)
 
