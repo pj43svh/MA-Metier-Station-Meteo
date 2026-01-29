@@ -25,8 +25,8 @@
 #define SEND_INTERVAL 20000              // Intervalle d'envoi (20 sec)
 
 // WiFi - Ton hotspot
-const char* WIFI_SSID = "Bomboclat";
-const char* WIFI_PASSWORD = "zyxouzyxou";
+const char* WIFI_SSID = "VOTRE_SSID";
+const char* WIFI_PASSWORD = "VOTRE_MOT_DE_PASSE";
 
 // URL du serveur Railway (cloud)
 String SERVER_URL = "https://nurturing-achievement-production.up.railway.app/request/";
