@@ -7,11 +7,14 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
-
-from app.api import api
-from app.route import route
-from app.esp import esp
-
+try:
+    from app.api import api
+    from app.route import route
+    from app.esp import esp
+except:
+    from api import api
+    from route import route
+    from esp import esp
 # Les blueprints serevnt à séparer les différentes parties de l'application
 # Quand on va sur /api/quelquechose, ça va aller dans api.py puis sur les
 # routes définies dans là bas.

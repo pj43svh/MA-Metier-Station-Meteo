@@ -139,13 +139,12 @@ async function fetchPressureData(date_selected = "today") {
                 y: {
                     title: {
                         display: true,
-                        text: '°C',
+                        text: 'hPa',
                         color: 'rgba(53, 53, 53, 1)'
                     },
                     ticks: {
                         color: 'rgba(53, 53, 53, 1)'
-                    },
-                    min: 850
+                    }
 
                 }
             }

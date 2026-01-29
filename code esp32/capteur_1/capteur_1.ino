@@ -1,3 +1,14 @@
+#include <WiFiType.h>
+#include <WiFiScan.h>
+#include <WiFiSTA.h>
+#include <WiFiMulti.h>
+#include <WiFiAP.h>
+#include <WiFi.h>
+#include <WiFiUdp.h>
+#include <WiFiGeneric.h>
+#include <WiFiClient.h>
+#include <WiFiServer.h>
+
 /*
  * Station Meteo - Capteur 1 (ATOM_001)
  *
