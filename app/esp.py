@@ -91,8 +91,7 @@ def esp_request():
             "humidity": None,
             "pressure": None,
             "date": date_now,
-            "hour": hour_now,
-            "ts": ts_now #
+            "hour": hour_now
         })
 
     # Succès uniquement si les deux insertions ont réussi
