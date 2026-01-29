@@ -258,7 +258,7 @@ def api_datas_list(type_str, limit=100,date_filter="today"):
         )
         except:
             print("Wrong date :",date_filter)
-            return
+            return []
     if not results:
         return []
     

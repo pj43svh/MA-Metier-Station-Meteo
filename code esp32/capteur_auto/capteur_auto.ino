@@ -516,13 +516,11 @@ bool initSensors() {
         sht4.setHeater(SHT4X_NO_HEATER);
     }
 
-    if (!bmp.begin(0x76)) {
-        if (!bmp.begin(0x77)) {
-            Serial.println("BMP280 non trouve!");
-            success = false;
-        }
-    }
-    if (bmp.begin(0x76) || bmp.begin(0x77)) {
+    bool bmpFound = bmp.begin(0x76) || bmp.begin(0x77);
+    if (!bmpFound) {
+        Serial.println("BMP280 non trouve!");
+        success = false;
+    } else {
         Serial.println("BMP280 OK");
         bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,
                         Adafruit_BMP280::SAMPLING_X2,
@@ -541,19 +539,18 @@ bool registerWithServer() {
     HTTPClient http;
     http.setTimeout(30000);
 
+    WiFiClient clientHTTP;
+    WiFiClientSecure clientHTTPS;
+
     if (isLocalServer()) {
-        // HTTP local
-        WiFiClient client;
-        if (!http.begin(client, url)) {
+        if (!http.begin(clientHTTP, url)) {
             Serial.println("Erreur connexion serveur");
             return false;
         }
     } else {
-        // HTTPS distant
-        WiFiClientSecure client;
-        client.setInsecure();
-        client.setTimeout(30000);
-        if (!http.begin(client, url)) {
+        clientHTTPS.setInsecure();
+        clientHTTPS.setTimeout(30000);
+        if (!http.begin(clientHTTPS, url)) {
             Serial.println("Erreur connexion serveur");
             return false;
         }
@@ -572,9 +569,9 @@ bool registerWithServer() {
 
         StaticJsonDocument<256> doc;
         if (deserializeJson(doc, response) == DeserializationError::Ok) {
-            const char* status = doc["status"];
+            const char* status = doc["status"] | "";
             if (strcmp(status, "configured") == 0) {
-                sensorNumber = doc["sensor_number"];
+                sensorNumber = doc["sensor_number"] | 0;
                 capteurID = String(doc["capteur_id"] | "");
                 Serial.println("Deja configure comme: " + capteurID);
                 http.end();
@@ -598,14 +595,15 @@ bool getConfigFromServer() {
     HTTPClient http;
     http.setTimeout(30000);
 
+    WiFiClient clientHTTP;
+    WiFiClientSecure clientHTTPS;
+
     if (isLocalServer()) {
-        WiFiClient client;
-        if (!http.begin(client, url)) return false;
+        if (!http.begin(clientHTTP, url)) return false;
     } else {
-        WiFiClientSecure client;
-        client.setInsecure();
-        client.setTimeout(30000);
-        if (!http.begin(client, url)) return false;
+        clientHTTPS.setInsecure();
+        clientHTTPS.setTimeout(30000);
+        if (!http.begin(clientHTTPS, url)) return false;
     }
 
     int httpCode = http.GET();
@@ -615,9 +613,9 @@ bool getConfigFromServer() {
 
         StaticJsonDocument<256> doc;
         if (deserializeJson(doc, response) == DeserializationError::Ok) {
-            const char* status = doc["status"];
+            const char* status = doc["status"] | "";
             if (strcmp(status, "configured") == 0) {
-                int newSensorNumber = doc["sensor_number"];
+                int newSensorNumber = doc["sensor_number"] | 0;
                 if (newSensorNumber != sensorNumber) {
                     sensorNumber = newSensorNumber;
                     capteurID = String(doc["capteur_id"] | "");
@@ -642,18 +640,19 @@ void sendData(float temp, float hum, float press) {
     http.setTimeout(30000);
     http.setConnectTimeout(30000);
 
+    WiFiClient clientHTTP;
+    WiFiClientSecure clientHTTPS;
+
     if (isLocalServer()) {
-        WiFiClient client;
-        if (!http.begin(client, url)) {
+        if (!http.begin(clientHTTP, url)) {
             Serial.println("Erreur connexion");
             return;
         }
     } else {
-        WiFiClientSecure client;
-        client.setInsecure();
-        client.setTimeout(30000);
-        client.setHandshakeTimeout(30);
-        if (!http.begin(client, url)) {
+        clientHTTPS.setInsecure();
+        clientHTTPS.setTimeout(30000);
+        clientHTTPS.setHandshakeTimeout(30);
+        if (!http.begin(clientHTTPS, url)) {
             Serial.println("Erreur connexion");
             return;
         }
